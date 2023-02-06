@@ -218,3 +218,6 @@ Temporary Items
 backend-fastapi/env-fastapi
 
 
+backend-fastapi/.env
+
+

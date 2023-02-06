@@ -1,17 +1,21 @@
-# Pull base image
-FROM python:3.7
+#linux image that have python
+FROM python:3
 
-# Set environment varibles
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
-WORKDIR /code/
+RUN mkdir /backend-fastapi
 
-# Install dependencies
-RUN pip install pipenv
-COPY Pipfile Pipfile.lock /code/
-RUN pipenv install --system --dev
+WORKDIR /backend-fastapi
 
-COPY . /code/
+COPY requirements.txt requirements.txt
 
-EXPOSE 8000
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
+
+COPY . /backend-fastapi/
+
+ENV ON_DOCKER Yes
+
+EXPOSE 5000
+
+# CMD ["python", "main.py"]
