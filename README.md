@@ -10,4 +10,17 @@ source env-cryptocurrency/bin/activate
 pip3 install -r requirements.txt
 
 
+
+
+
+# Comandos para crear la bd
+docker-compose run app alembic revision --autogenerate -m "New Migration"
+docker-compose run app alembic upgrade head
+
+
+# comandos para correr el proyecto
+docker-compose build
+docker-compose up
+
 ```
+
