@@ -9,6 +9,7 @@ import uuid
 class Price(Base):
 
     __tablename__ = "prices"
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -21,10 +22,5 @@ class Price(Base):
     high_price = Column(Float)
     volume = Column(Integer)
 
-    asset_id = Column(String, ForeignKey("assets.id"))
-    exchange = relationship("assets")
-
-    __mapper_args__ = {
-        "polymorphic_identity": "prices",
-        "polymorphic_on": "type",
-    }
+    asset_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"))
+    asset = relationship("assets")

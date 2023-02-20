@@ -20,6 +20,6 @@ class Asset(Base):
     quote_asset = Column(String)
     interval = Column(String)
     asset_type = Column(String)
-    exchange_id = Column(String, ForeignKey("exchanges.id"))
 
+    exchange_id = Column(UUID(as_uuid=True), ForeignKey("exchanges.id"))
     exchange = relationship("exchanges")

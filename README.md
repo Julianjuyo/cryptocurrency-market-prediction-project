@@ -14,8 +14,8 @@ pip3 install -r requirements.txt
 
 
 # Comandos para crear la bd
-docker-compose run app alembic revision --autogenerate -m "New Migration"
-docker-compose run app alembic upgrade head
+docker-compose run fastapi alembic revision --autogenerate -m "New Migration"
+docker-compose run fastapi alembic upgrade head
 
 
 # comandos para correr el proyecto
