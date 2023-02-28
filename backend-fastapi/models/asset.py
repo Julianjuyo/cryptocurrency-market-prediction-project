@@ -22,4 +22,4 @@ class Asset(Base):
     asset_type = Column(String)
 
     exchange_id = Column(UUID(as_uuid=True), ForeignKey("exchanges.id"))
-    exchange = relationship("exchanges")
+    exchange_origin = relationship("Exchange", back_populates="assets")

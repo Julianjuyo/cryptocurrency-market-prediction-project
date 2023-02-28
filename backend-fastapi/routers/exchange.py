@@ -1,10 +1,8 @@
 # Pydantic
-from pydantic import BaseModel
-from pydantic import Field
+
 
 # Python
 from typing import List
-
 import json
 
 
@@ -27,6 +25,20 @@ from models.exchange import Exchange as ExchangeModel
 
 
 exchange_router = APIRouter()
+
+
+@exchange_router.post(
+    path='/exchanges',
+    tags=['exchanges'],
+    response_model=Exchange,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a Exchange",
+)
+def create_exchange(exchange: Exchange) -> Exchange:
+
+    result = ExchangeService(db.session).create_exchange(exchange)
+
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(result))
 
 
 @exchange_router.get(
@@ -75,20 +87,6 @@ def get_exchange(id: str = Path()) -> Exchange:
     return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
 
 
-@exchange_router.post(
-    path='/exchanges',
-    tags=['exchanges'],
-    response_model=Exchange,
-    status_code=status.HTTP_201_CREATED,
-    summary="Create a Exchange",
-)
-def create_exchange(exchange: Exchange) -> Exchange:
-
-    ExchangeService(db.session).create_exchange(exchange)
-
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(exchange))
-
-
 @exchange_router.put(
     path='/exchanges/{id}',
     tags=['exchanges'],
@@ -110,10 +108,10 @@ def update_exchange(id: str, exchange: Exchange) -> Exchange:
 @exchange_router.delete(
     path='/exchanges/{id}',
     tags=['exchanges'],
-    response_model= Exchange,
+    response_model=Exchange,
     status_code=status.HTTP_200_OK,
     summary="Delete a Exchange")
-def delete_exchange(id:str)->Exchange:
+def delete_exchange(id: str) -> Exchange:
 
     result = ExchangeService(db.session).get_exchange(id)
 
