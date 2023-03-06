@@ -22,5 +22,5 @@ class Indicator(Base):
     date_time_gmt_5 = Column(DateTime(timezone=True))
 
 
-    # price_id = Column(UUID(as_uuid=True), ForeignKey("prices.id"))
-    # price = relationship("prices")
+    price_id = Column(UUID(as_uuid=True), ForeignKey("prices.id"))
+    price_origin = relationship("Price", back_populates='indicators')
