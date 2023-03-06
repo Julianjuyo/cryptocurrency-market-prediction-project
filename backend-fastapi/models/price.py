@@ -22,5 +22,7 @@ class Price(Base):
     high_price = Column(Float)
     volume = Column(Integer)
 
-    # asset_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"))
-    # asset = relationship("Price", back_populates='assets')
+    asset_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"))
+    asset_origin = relationship("Asset", back_populates='prices')
+
+

@@ -1,5 +1,5 @@
 from models import Base
-
+from models.price import Price
 from sqlalchemy import Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -20,6 +20,8 @@ class Asset(Base):
     quote_asset = Column(String)
     interval = Column(String)
     asset_type = Column(String)
+
+    prices = relationship("Price",  back_populates="asset_origin")
 
     exchange_id = Column(UUID(as_uuid=True), ForeignKey("exchanges.id"))
     exchange_origin = relationship("Exchange", back_populates="assets")

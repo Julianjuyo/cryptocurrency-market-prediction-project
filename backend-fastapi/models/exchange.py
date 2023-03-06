@@ -1,4 +1,5 @@
 from models import Base
+from models.asset import Asset
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -16,6 +17,3 @@ class Exchange(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     assets = relationship("Asset", back_populates="exchange_origin")
-
-
-
