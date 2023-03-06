@@ -23,11 +23,13 @@ class Price(Base):
     high_price = Column(Float)
     volume = Column(Integer)
 
+    qav = Column(Float)
+    num_trades = Column(Integer)
+    taker_base_vol = Column(Float)
+    taker_quote_vol = Column(Float)
+    ignore = Column(Integer)
+
     asset_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"))
     asset_origin = relationship("Asset", back_populates='prices')
 
-
-
     indicators = relationship("Indicator",  back_populates="price_origin")
-
-

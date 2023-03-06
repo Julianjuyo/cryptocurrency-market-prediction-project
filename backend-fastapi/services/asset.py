@@ -38,8 +38,6 @@ class AssetService():
         if (result == None):
             return {'error message': "The exchange with the given id was not found"}
 
-        print(result)
-
         return result
 
     def get_asset_by_symbol(self, symbol: str):
@@ -69,7 +67,10 @@ class AssetService():
         self.db.add(new_asset)
         self.db.commit()
 
-        return asset
+        result_new_asset = self.db.query(AssetModel).filter(
+            AssetModel.id == new_asset.id).first()
+
+        return result_new_asset
 
     def update_asset_to_exchange(self, exchange_id: str, asset_id: str, asset_update: UpdateAsset):
 
