@@ -27,7 +27,7 @@ asset_router = APIRouter()
 
 @asset_router.post(
     path='/exchanges/{exchange_id}/asset',
-    tags=['asset'],
+    tags=['assets'],
     response_model=Asset,
     status_code=status.HTTP_201_CREATED,
     summary="Create an Asset to a Exchnage",
@@ -39,7 +39,7 @@ def create_asset_to_exchange(asset: Asset, exchange_id: str = Path()) -> Asset:
 
     result_json = jsonable_encoder(result)
 
-    if "error message" in result:
+    if "error message" in result_json:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=result_json)
@@ -47,7 +47,7 @@ def create_asset_to_exchange(asset: Asset, exchange_id: str = Path()) -> Asset:
 
 @asset_router.get(
     path='/exchange/{exchange_id}/asset/',
-    tags=['asset'],
+    tags=['assets'],
     response_model=List[Asset],
 
     status_code=status.HTTP_200_OK,
@@ -58,7 +58,7 @@ def get_assets_by_exchange_id(exchange_id: str = Path()) -> List[Asset]:
 
     result_json = jsonable_encoder(result)
 
-    if "error message" in result:
+    if "error message" in result_json:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
@@ -66,7 +66,7 @@ def get_assets_by_exchange_id(exchange_id: str = Path()) -> List[Asset]:
 
 @asset_router.get(
     path='/exchanges/{exchange_id}/asset',
-    tags=['asset'],
+    tags=['assets'],
     response_model=Asset,
     status_code=status.HTTP_200_OK,
     summary="Get Assets by the symbol ")
@@ -76,7 +76,7 @@ def get_asset_by_symbol(symbol: str = Query(min_length=2)) -> List[Asset]:
 
     result_json = jsonable_encoder(result)
 
-    if "error message" in result:
+    if "error message" in result_json:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
@@ -84,7 +84,7 @@ def get_asset_by_symbol(symbol: str = Query(min_length=2)) -> List[Asset]:
 
 @asset_router.get(
     path='/exchanges/{exchange_id}/asset/{asset_id}',
-    tags=['asset'],
+    tags=['assets'],
     response_model=Asset,
     status_code=status.HTTP_200_OK,
     summary="Get One Asset from a exchange ")
@@ -103,7 +103,7 @@ def get_asset_by_exchange_id(exchange_id: str = Path(), asset_id: str = Path()) 
 
 @asset_router.put(
     path='/exchanges/{exchange_id}/asset/{asset_id}',
-    tags=['asset'],
+    tags=['assets'],
     response_model=UpdateAsset,
     status_code=status.HTTP_200_OK,
     summary="Update an Asset from a Exchange")
@@ -122,7 +122,7 @@ def update_exchange(asset: UpdateAsset, exchange_id: str = Path(), asset_id: str
 
 @asset_router.delete(
     path='/exchanges/{exchange_id}/asset/{asset_id}',
-    tags=['asset'],
+    tags=['assets'],
     response_model=Asset,
     status_code=status.HTTP_200_OK,
     summary="Delete a Exchange")

@@ -12,18 +12,27 @@ class ExchangeService():
 
         result = self.db.query(ExchangeModel).all()
 
-        print(type(result))
+        if (result == None):
+            return {'error message': 'Theres no exchanges created'}
+
         return result
 
     def get_exchange(self, id: str):
         result = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == id).first()
 
+        if (result == None):
+            return {'error message': "The exchange with the given id was not found"}
+
         return result
 
     def get_exchange_by_name(self, name):
         result = self.db.query(ExchangeModel).filter(
             ExchangeModel.name == name).options(joinedload(ExchangeModel.assets)).all()
+
+        if (result == None):
+            return {'error message': "The exchange with the given name was not found"}
+
         return result
 
     def create_exchange(self, exchange: Exchange):
@@ -32,7 +41,7 @@ class ExchangeService():
             ExchangeModel.name == exchange.name).all()
 
         if result:
-            return 'The Exchange allready exists'
+            return {'error message': 'The Exchange allready exists'}
 
         new_exchange = ExchangeModel(**exchange.dict())
         self.db.add(new_exchange)
@@ -47,6 +56,10 @@ class ExchangeService():
 
         exchange = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == id).first()
+
+        if (exchange == None):
+            return {'error message': 'The exchange with the given id was not found'}
+
         exchange.name = data.name
         self.db.commit()
 

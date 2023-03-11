@@ -55,9 +55,9 @@ class AssetService():
             return {'error message': 'The exchange with the given id was not found'}
 
         result = self.db.query(AssetModel).filter(and_(
-            AssetModel.symbol == asset.symbol, AssetModel.exchange_id == exchange_id)).first()
+            AssetModel.symbol == asset.symbol, AssetModel.exchange_id == exchange_id, AssetModel.interval == asset.interval)).first()
 
-        if result and result.symbol == asset.symbol and str(result.exchange_id) == exchange_id:
+        if result:
             return {'error message': 'The Asset allready exists'}
 
         new_asset = AssetModel(**asset.dict())
@@ -76,8 +76,6 @@ class AssetService():
 
         exchange = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == exchange_id).first()
-
-        print(exchange)
 
         if (exchange == None):
             return {'error message': 'The exchange with the given id was not found'}

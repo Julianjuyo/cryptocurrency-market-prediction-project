@@ -31,3 +31,7 @@ app.add_middleware(DBSessionMiddleware, db_url=os.environ["DATABASE_URL"])
 @app.get(path="/", tags=['home'])
 async def home():
     return {"Cripto currency trading": "working"}
+
+
+
+

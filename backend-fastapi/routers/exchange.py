@@ -38,7 +38,12 @@ def create_exchange(exchange: Exchange) -> Exchange:
 
     result = ExchangeService(db.session).create_exchange(exchange)
 
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(result))
+    result_json = jsonable_encoder(result)
+
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
+
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=result_json)
 
 
 @exchange_router.get(
@@ -52,7 +57,12 @@ def get_exchanges() -> List[Exchange]:
 
     result = ExchangeService(db.session).get_exchanges()
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
+    result_json = jsonable_encoder(result)
+
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
 
 
 @exchange_router.get(
@@ -65,10 +75,12 @@ def get_exchange_by_name(name: str = Query(min_length=2, max_length=100)) -> Lis
 
     result = ExchangeService(db.session).get_exchange_by_name(name)
 
-    if not result:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={'message': "No se encontró el exchange por el nombre"})
+    result_json = jsonable_encoder(result)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
 
 
 @exchange_router.get(
@@ -81,10 +93,12 @@ def get_exchange(id: str = Path()) -> Exchange:
 
     result = ExchangeService(db.session).get_exchange(id)
 
-    if not result:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={'message': "No se encontró el exchange por el id"})
+    result_json = jsonable_encoder(result)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
 
 
 @exchange_router.put(
@@ -95,14 +109,14 @@ def get_exchange(id: str = Path()) -> Exchange:
     summary="Update a Exchange")
 def update_exchange(id: str, exchange: Exchange) -> Exchange:
 
-    result = ExchangeService(db.session).get_exchange(id)
+    result = ExchangeService(db.session).update_exchange(id, exchange)
 
-    if not result:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={'message': "No se encontró el exchange por el id"})
+    result_json = jsonable_encoder(result)
 
-    ExchangeService(db.session).update_exchange(id, exchange)
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
 
 
 @exchange_router.delete(
@@ -115,9 +129,9 @@ def delete_exchange(id: str) -> Exchange:
 
     result = ExchangeService(db.session).get_exchange(id)
 
-    if not result:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={'message': "No se encontró el exchange por el id"})
+    result_json = jsonable_encoder(result)
 
-    ExchangeService(db.session).delete_exchange(id)
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(result))
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)

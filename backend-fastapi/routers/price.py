@@ -39,7 +39,11 @@ def create_price_to_Asset(price: Price, asset_id: str = Path()) -> Price:
 
     result_json = jsonable_encoder(result)
 
-    if "error message" in result:
+
+    if "error message" in result_json:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=result_json)
+
+
+
