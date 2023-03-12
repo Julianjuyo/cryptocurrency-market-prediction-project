@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from routers.exchange import exchange_router
 from routers.asset import asset_router
 from routers.price import price_router
+from routers.indicator import indicator_router
 
 app = FastAPI()
 app.title = "Crypto currency market prediction Tesis"
@@ -21,6 +22,7 @@ app.version = "0.0.1"
 app.include_router(exchange_router)
 app.include_router(asset_router)
 app.include_router(price_router)
+app.include_router(indicator_router)
 
 
 # connect to the database
@@ -31,7 +33,3 @@ app.add_middleware(DBSessionMiddleware, db_url=os.environ["DATABASE_URL"])
 @app.get(path="/", tags=['home'])
 async def home():
     return {"Cripto currency trading": "working"}
-
-
-
-

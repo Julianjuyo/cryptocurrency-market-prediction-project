@@ -24,27 +24,11 @@ class IndicatorService():
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         result = self.db.query(IndicatorModel).filter(
             IndicatorModel.price_id == price_id).all()
-
-        return result
-
-    def get_indicator_by_price_id(self, price_id: str, indicator_id: str):
-
-        price = self.db.query(PriceModel).filter(
-            PriceModel.id == price_id).first()
-
-        if (price == None):
-            return {'error message': "The Price with the given id was not found"}
-
-        result = self.db.query(IndicatorModel).filter(
-            IndicatorModel.id == indicator_id).first()
-
-        if (result == None):
-            return {'error message': "The Indicator with the given id was not found"}
 
         return result
 
@@ -53,13 +37,13 @@ class IndicatorService():
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         result = self.db.query(IndicatorModel).filter(and_(
             IndicatorModel.unix_time == unix_time, IndicatorModel.price_id == price_id)).first()
 
-        if (result == None):
+        if not result:
             return {'error message': "The Indicator with the given unixTIme was not found"}
 
         return result
@@ -69,14 +53,30 @@ class IndicatorService():
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         result = self.db.query(IndicatorModel).filter(and_(
             IndicatorModel.unix_time >= unix_time_start, IndicatorModel.unix_time <= unix_time_end, IndicatorModel.price_id == price_id)).all()
 
-        if (result == None):
+        if not result:
             return {'error message': 'The Indicatorse with the given unix_time time range was not found'}
+
+        return result
+
+    def get_indicator_by_price_id(self, price_id: str, indicator_id: str):
+
+        price = self.db.query(PriceModel).filter(
+            PriceModel.id == price_id).first()
+
+        if not price:
+            return {'error message': "The Price with the given id was not found"}
+
+        result = self.db.query(IndicatorModel).filter(
+            IndicatorModel.id == indicator_id).first()
+
+        if not result:
+            return {'error message': "The Indicator with the given id was not found"}
 
         return result
 
@@ -85,7 +85,7 @@ class IndicatorService():
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         result = self.db.query(IndicatorModel).filter(and_(
@@ -116,17 +116,23 @@ class IndicatorService():
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         indicator = self.db.query(IndicatorModel).filter(
             IndicatorModel.id == indicator_id).first()
 
-        if (indicator == None):
+        if not indicator:
             return {'error message': "The Indicator with the given id was not found"}
 
         for key, value in vars(indicator_update).items():
             setattr(indicator, key, value) if value else None
+
+        utc_datetime, gmt5_datetime = convert_unix_time(
+            indicator_update.unix_time)
+        indicator.date_time_utc = utc_datetime
+        indicator.date_time_gmt_5 = gmt5_datetime
+
 
         self.db.commit()
 
@@ -141,13 +147,13 @@ class IndicatorService():
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         indicator = self.db.query(IndicatorModel).filter(
             IndicatorModel.id == indicator_id).first()
 
-        if (indicator == None):
+        if not indicator:
             return {'error message': "The Indicator with the given id was not found"}
 
         self.db.query(IndicatorModel).filter(

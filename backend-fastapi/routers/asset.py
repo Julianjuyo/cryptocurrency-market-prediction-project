@@ -32,7 +32,7 @@ asset_router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     summary="Create an Asset to a Exchnage",
 )
-def create_asset_to_exchange(asset: Asset, exchange_id: str = Path()) -> Asset:
+def create_asset_to_exchange(asset: Asset, exchange_id: str = Path(min_length=36,max_length=36)) -> Asset:
 
     result = AssetService(db.session).create_asset_to_exchange(
         exchange_id, asset)
@@ -52,7 +52,7 @@ def create_asset_to_exchange(asset: Asset, exchange_id: str = Path()) -> Asset:
 
     status_code=status.HTTP_200_OK,
     summary="Get all the assets of a exchange ")
-def get_assets_by_exchange_id(exchange_id: str = Path()) -> List[Asset]:
+def get_assets_by_exchange_id(exchange_id: str = Path(min_length=36,max_length=36)) -> List[Asset]:
 
     result = AssetService(db.session).get_assets_by_exchange_id(exchange_id)
 
@@ -88,7 +88,7 @@ def get_asset_by_symbol(symbol: str = Query(min_length=2)) -> List[Asset]:
     response_model=Asset,
     status_code=status.HTTP_200_OK,
     summary="Get One Asset from a exchange ")
-def get_asset_by_exchange_id(exchange_id: str = Path(), asset_id: str = Path()) -> List[Asset]:
+def get_asset_by_exchange_id(exchange_id: str = Path(min_length=36,max_length=36), asset_id: str = Path(min_length=36,max_length=36)) -> Asset:
 
     result = AssetService(db.session).get_asset_by_exchange_id(
         exchange_id, asset_id)
@@ -107,7 +107,7 @@ def get_asset_by_exchange_id(exchange_id: str = Path(), asset_id: str = Path()) 
     response_model=UpdateAsset,
     status_code=status.HTTP_200_OK,
     summary="Update an Asset from a Exchange")
-def update_exchange(asset: UpdateAsset, exchange_id: str = Path(), asset_id: str = Path()) -> Asset:
+def update_exchange(asset: UpdateAsset, exchange_id: str = Path(min_length=36,max_length=36), asset_id: str = Path(min_length=36,max_length=36)) -> Asset:
 
     result = AssetService(db.session).update_asset_to_exchange(
         exchange_id, asset_id, asset)
@@ -126,7 +126,7 @@ def update_exchange(asset: UpdateAsset, exchange_id: str = Path(), asset_id: str
     response_model=Asset,
     status_code=status.HTTP_200_OK,
     summary="Delete a Exchange")
-def delete_exchange(exchange_id: str = Path(), asset_id: str = Path()) -> Asset:
+def delete_exchange(exchange_id: str = Path(min_length=36,max_length=36), asset_id: str = Path(min_length=36,max_length=36)) -> Asset:
 
     result = AssetService(db.session).delete_asset_to_exchange(
         exchange_id, asset_id)

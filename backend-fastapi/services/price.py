@@ -19,7 +19,7 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         result = self.db.query(PriceModel).filter(
@@ -32,13 +32,13 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         result = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (result == None):
+        if not result:
             return {'error message': "The Price with the given id was not found"}
 
         return result
@@ -48,13 +48,13 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         result = self.db.query(PriceModel).filter(and_(
             PriceModel.unix_time == unix_time, PriceModel.asset_id == asset_id)).first()
 
-        if (result == None):
+        if not result:
             return {'error message': 'The Price with the given unix_time was not found'}
 
         return result
@@ -64,13 +64,13 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         result = self.db.query(PriceModel).filter(and_(
             PriceModel.unix_time >= unix_time_start, PriceModel.unix_time <= unix_time_end, PriceModel.asset_id == asset_id)).all()
 
-        if (result == None):
+        if not result:
             return {'error message': 'The Prices with the given unix_time time range was not found'}
 
         return result
@@ -80,7 +80,7 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         result = self.db.query(PriceModel).filter(and_(
@@ -110,17 +110,21 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         for key, value in vars(price_update).items():
             setattr(price, key, value) if value else None
+
+        utc_datetime, gmt5_datetime = convert_unix_time(price_update.unix_time)
+        price.date_time_utc = utc_datetime
+        price.date_time_gmt_5 = gmt5_datetime
 
         self.db.commit()
 
@@ -135,13 +139,13 @@ class PriceService():
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (asset == None):
+        if not asset:
             return {'error message': 'The Asset with the given id was not found'}
 
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
 
-        if (price == None):
+        if not price:
             return {'error message': "The Price with the given id was not found"}
 
         self.db.query(PriceModel).filter(PriceModel.id == price_id).delete()

@@ -39,7 +39,6 @@ class UpdatePrice(BaseModel):
     taker_base_vol: Optional[float] = Field(None, example=10)
     taker_quote_vol: Optional[float] = Field(None, example=10)
     ignore: Optional[int] = Field(None, example=10)
-    asset_id: Optional[UUID] = Field(None, example="00000-00000-00000-00000")
 
     class Config:
         orm_mode = True

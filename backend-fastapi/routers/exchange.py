@@ -89,7 +89,7 @@ def get_exchange_by_name(name: str = Query(min_length=2, max_length=100)) -> Lis
     response_model=Exchange,
     status_code=status.HTTP_200_OK,
     summary="Get one Exchange by the id")
-def get_exchange(id: str = Path()) -> Exchange:
+def get_exchange(id: str = Path(min_length=36,max_length=36)) -> Exchange:
 
     result = ExchangeService(db.session).get_exchange(id)
 

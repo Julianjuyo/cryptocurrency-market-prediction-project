@@ -48,8 +48,6 @@ class UpdateAsset(BaseModel):
                                               example=IntervalAsset.minute)
     asset_type: Optional[Asset_type] = Field(None,
                                              example=Asset_type.Cryptocurrency)
-    exchange_id: Optional[UUID] = Field(
-        None, example="00000-00000-00000-00000")
 
     class Config:
         orm_mode = True

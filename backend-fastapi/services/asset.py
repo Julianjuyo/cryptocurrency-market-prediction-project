@@ -16,7 +16,7 @@ class AssetService():
         exchange = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == exchange_id).first()
 
-        if (exchange == None):
+        if not exchange:
             return {'error message': 'The exchange with the given id was not found'}
 
         result = self.db.query(AssetModel).filter(
@@ -29,13 +29,13 @@ class AssetService():
         exchange = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == exchange_id).first()
 
-        if (exchange == None):
+        if not exchange:
             return {'error message': "The exchange with the given id was not found"}
 
         result = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
-        if (result == None):
+        if not result:
             return {'error message': "The exchange with the given id was not found"}
 
         return result
@@ -44,6 +44,11 @@ class AssetService():
 
         result = self.db.query(AssetModel).filter(
             AssetModel.symbol == symbol).all()
+
+        print(result)
+        if not result:
+            return {'error message': 'The Asset with the given symbol was not found'}
+
         return result
 
     def create_asset_to_exchange(self, exchange_id: str,  asset: Asset):
@@ -51,11 +56,13 @@ class AssetService():
         exchange = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == exchange_id).first()
 
-        if (exchange == None):
+        if not exchange:
             return {'error message': 'The exchange with the given id was not found'}
 
         result = self.db.query(AssetModel).filter(and_(
             AssetModel.symbol == asset.symbol, AssetModel.exchange_id == exchange_id, AssetModel.interval == asset.interval)).first()
+
+        print(result)
 
         if result:
             return {'error message': 'The Asset allready exists'}
@@ -77,7 +84,7 @@ class AssetService():
         exchange = self.db.query(ExchangeModel).filter(
             ExchangeModel.id == exchange_id).first()
 
-        if (exchange == None):
+        if not exchange:
             return {'error message': 'The exchange with the given id was not found'}
 
         asset = self.db.query(AssetModel).filter(
@@ -103,7 +110,7 @@ class AssetService():
 
         print(exchange)
 
-        if (exchange == None):
+        if not exchange:
             return {'error message': 'The exchange with the given id was not found'}
 
         asset = self.db.query(AssetModel).filter(
