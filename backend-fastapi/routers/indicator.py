@@ -1,16 +1,12 @@
 from typing import List
-import json
-
 
 # FastAPI
 from fastapi import APIRouter
-from fastapi import Body
 from fastapi import Query
 from fastapi import Path
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-
 from fastapi_sqlalchemy import db
 
 from schemas.indicator import Indicator
@@ -30,10 +26,10 @@ indicator_router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     summary="Create a indicator to an Price"
 )
-def create_indicator_to_Price(indicator: Indicator, price_id: str = Path(min_length=36,max_length=36)) -> Indicator:
+def create_indicator_to_price(indicator: Indicator, price_id: str = Path(min_length=36, max_length=36)) -> Indicator:
 
     result = IndicatorService(
-        db.session).create_indicator_to_Price(price_id, indicator)
+        db.session).create_indicator_to_price(price_id, indicator)
 
     result_json = jsonable_encoder(result)
 
@@ -49,7 +45,7 @@ def create_indicator_to_Price(indicator: Indicator, price_id: str = Path(min_len
     response_model=List[Indicator],
     status_code=status.HTTP_200_OK,
     summary="Get a Indicator with a given unixTime of an Price")
-def get_indicator_by_unix_time_and_by_price_id(price_id: str = Path(min_length=36,max_length=36), unix_time: str = Query(min_length=2)) -> Indicator:
+def get_indicator_by_unix_time_and_by_price_id(price_id: str = Path(min_length=36, max_length=36), unix_time: str = Query(min_length=2)) -> Indicator:
 
     result = IndicatorService(db.session).get_indicator_by_unix_time_and_by_price_id(
         price_id, unix_time)
@@ -68,7 +64,7 @@ def get_indicator_by_unix_time_and_by_price_id(price_id: str = Path(min_length=3
     response_model=List[Indicator],
     status_code=status.HTTP_200_OK,
     summary="Get all the indicators between Dates of an price")
-def get_indicators_between_unix_time_and_by_price_id(price_id: str = Path(min_length=36,max_length=36), unix_time_start: str = Query(min_length=2), unix_time_end: str = Query(min_length=2)) -> Indicator:
+def get_indicators_between_unix_time_and_by_price_id(price_id: str = Path(min_length=36, max_length=36), unix_time_start: str = Query(min_length=2), unix_time_end: str = Query(min_length=2)) -> Indicator:
 
     result = IndicatorService(db.session).get_indicators_between_unix_time_and_by_price_id(
         price_id, unix_time_start, unix_time_end)
@@ -87,7 +83,7 @@ def get_indicators_between_unix_time_and_by_price_id(price_id: str = Path(min_le
     response_model=List[Indicator],
     status_code=status.HTTP_200_OK,
     summary="Get all the indicators of an price")
-def get_all_indicators_by_price_id(price_id: str = Path(min_length=36,max_length=36)) -> List[Indicator]:
+def get_all_indicators_by_price_id(price_id: str = Path(min_length=36, max_length=36)) -> List[Indicator]:
 
     result = IndicatorService(
         db.session).get_all_indicators_by_price_id(price_id)
@@ -106,7 +102,7 @@ def get_all_indicators_by_price_id(price_id: str = Path(min_length=36,max_length
     response_model=List[Indicator],
     status_code=status.HTTP_200_OK,
     summary="Get One Inidicator of an price")
-def get_indicator_by_price_id(price_id: str = Path(min_length=36,max_length=36), indicator_id: str = Path(min_length=36,max_length=36)) -> Indicator:
+def get_indicator_by_price_id(price_id: str = Path(min_length=36, max_length=36), indicator_id: str = Path(min_length=36, max_length=36)) -> Indicator:
 
     result = IndicatorService(db.session).get_indicator_by_price_id(
         price_id, indicator_id)
@@ -125,7 +121,7 @@ def get_indicator_by_price_id(price_id: str = Path(min_length=36,max_length=36),
     response_model=List[Indicator],
     status_code=status.HTTP_200_OK,
     summary="Update a indicator of an price")
-def update_exchange(indicator: UpdateIndicator, price_id: str = Path(min_length=36,max_length=36), indicator_id: str = Path(min_length=36,max_length=36)) -> Indicator:
+def update_exchange(indicator: UpdateIndicator, price_id: str = Path(min_length=36, max_length=36), indicator_id: str = Path(min_length=36, max_length=36)) -> Indicator:
 
     result = IndicatorService(db.session).update_indicator_to_price(
         price_id, indicator_id, indicator)
@@ -144,7 +140,7 @@ def update_exchange(indicator: UpdateIndicator, price_id: str = Path(min_length=
     response_model=List[Indicator],
     status_code=status.HTTP_200_OK,
     summary="Delete a indicator of an price")
-def update_exchange(price_id: str = Path(min_length=36,max_length=36), indicator_id: str = Path(min_length=36,max_length=36)) -> Indicator:
+def update_exchange(price_id: str = Path(min_length=36, max_length=36), indicator_id: str = Path(min_length=36, max_length=36)) -> Indicator:
 
     result = IndicatorService(db.session).delete_indicator_to_price(
         price_id, indicator_id)

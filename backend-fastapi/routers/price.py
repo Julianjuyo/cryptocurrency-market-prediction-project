@@ -1,19 +1,14 @@
 # Python
 from typing import List
-import json
-
 
 # FastAPI
 from fastapi import APIRouter
-from fastapi import Body
 from fastapi import Query
 from fastapi import Path
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-
 from fastapi_sqlalchemy import db
-
 
 # From the app
 from schemas.price import Price
@@ -33,7 +28,7 @@ price_router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     summary="Create a price to an Asset"
 )
-def create_price_to_Asset(price: Price, asset_id: str = Path(min_length=36,max_length=36)) -> Price:
+def create_price_to_Asset(price: Price, asset_id: str = Path()) -> Price:
 
     result = PriceService(db.session).create_price_to_Asset(asset_id, price)
 
@@ -51,11 +46,7 @@ def create_price_to_Asset(price: Price, asset_id: str = Path(min_length=36,max_l
     response_model=List[Price],
     status_code=status.HTTP_200_OK,
     summary="Get all the prices of an asset")
-def get_all_prices_by_asset_id(asset_id: str = Path(min_length=36,max_length=36)) -> List[Price]:
-
-
-    print("HOLAAAAAAAAAAA" + asset_id)
-    print("HOLAAAAAAAAAAA2" + str(len(asset_id)))
+def get_all_prices_by_asset_id(asset_id: str = Path(min_length=36, max_length=36)) -> List[Price]:
 
     result = PriceService(db.session).get_all_prices_by_asset_id(asset_id)
 
@@ -73,7 +64,7 @@ def get_all_prices_by_asset_id(asset_id: str = Path(min_length=36,max_length=36)
     response_model=List[Price],
     status_code=status.HTTP_200_OK,
     summary="Get a Price with a given unixTime of an Asset")
-def get_price_by_unix_time_and_by_asset_id(asset_id: str = Path(min_length=36,max_length=36), unix_time: str = Query(min_length=2)) -> Price:
+def get_price_by_unix_time_and_by_asset_id(asset_id: str = Path(), unix_time: str = Query(min_length=2)) -> Price:
 
     result = PriceService(db.session).get_price_by_unix_time_and_by_asset_id(
         asset_id, unix_time)
@@ -92,7 +83,7 @@ def get_price_by_unix_time_and_by_asset_id(asset_id: str = Path(min_length=36,ma
     response_model=List[Price],
     status_code=status.HTTP_200_OK,
     summary="Get all the prices between Dates of an asset")
-def get_prices_between_unix_time_and_by_asset_id(asset_id: str = Path(min_length=36,max_length=36), unix_time_start: str = Query(min_length=2), unix_time_end: str = Query(min_length=2)) -> Price:
+def get_prices_between_unix_time_and_by_asset_id(asset_id: str = Path(), unix_time_start: str = Query(min_length=2), unix_time_end: str = Query(min_length=2)) -> Price:
 
     result = PriceService(db.session).get_prices_between_unix_time_and_by_asset_id(
         asset_id, unix_time_start, unix_time_end)
@@ -111,7 +102,7 @@ def get_prices_between_unix_time_and_by_asset_id(asset_id: str = Path(min_length
     response_model=List[Price],
     status_code=status.HTTP_200_OK,
     summary="Get One price of an asset")
-def get_price_by_asset_id(asset_id: str = Path(min_length=36,max_length=36), price_id: str = Path(min_length=36,max_length=36)) -> Price:
+def get_price_by_asset_id(asset_id: str = Path(), price_id: str = Path()) -> Price:
 
     result = PriceService(db.session).get_price_by_asset_id(
         asset_id, price_id)
@@ -130,7 +121,7 @@ def get_price_by_asset_id(asset_id: str = Path(min_length=36,max_length=36), pri
     response_model=List[Price],
     status_code=status.HTTP_200_OK,
     summary="Update a price of an asset")
-def update_exchange(price: UpdatePrice, asset_id: str = Path(min_length=36,max_length=36), price_id: str = Path(min_length=36,max_length=36)) -> Price:
+def update_exchange(price: UpdatePrice, asset_id: str = Path(), price_id: str = Path()) -> Price:
 
     result = PriceService(db.session).update_price_to_asset(
         asset_id, price_id, price)
@@ -149,7 +140,7 @@ def update_exchange(price: UpdatePrice, asset_id: str = Path(min_length=36,max_l
     response_model=List[Price],
     status_code=status.HTTP_200_OK,
     summary="Delete a price of an asset")
-def update_exchange(asset_id: str = Path(min_length=36,max_length=36), price_id: str = Path(min_length=36,max_length=36)) -> Price:
+def update_exchange(asset_id: str = Path(), price_id: str = Path()) -> Price:
 
     result = PriceService(db.session).delete_price_to_asset(asset_id, price_id)
 

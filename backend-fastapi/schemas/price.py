@@ -1,7 +1,6 @@
 
 
 from typing import Optional
-from uuid import UUID
 
 # Pydantic
 from pydantic import BaseModel

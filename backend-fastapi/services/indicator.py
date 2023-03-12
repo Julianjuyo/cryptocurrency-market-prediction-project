@@ -10,16 +10,13 @@ from schemas.indicator import UpdateIndicator
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_
 
-import datetime
-import pytz
-
 
 class IndicatorService():
 
     def __init__(self, db) -> None:
         self.db = db
 
-    def get_all_indicators_by_pirce_id(self, price_id: str):
+    def get_all_indicators_by_price_id(self, price_id: str):
 
         price = self.db.query(PriceModel).filter(
             PriceModel.id == price_id).first()
@@ -89,10 +86,14 @@ class IndicatorService():
             return {'error message': "The Price with the given id was not found"}
 
         result = self.db.query(IndicatorModel).filter(and_(
-            IndicatorModel.unix_time == price.unix_time, IndicatorModel.price_id == price_id)).first()
+            IndicatorModel.unix_time == price.unix_time, IndicatorModel.name == indicator.name, IndicatorModel.price_id == price_id)).first()
 
-        if result and result.unix_time == price.unix_time and str(result.price_id) == price_id:
-            return {'error message': 'The Price in the give unix_time allready exists'}
+        if result:
+            return {'error message': 'The Price in the give unix_time and name allready exists'}
+
+        if price.unix_time != indicator.unix_time:
+
+            return {'error message': 'The Price unixTime and the indicator UnixTime are not the same'}
 
         new_indicator = IndicatorModel(**indicator.dict())
 
@@ -132,7 +133,6 @@ class IndicatorService():
             indicator_update.unix_time)
         indicator.date_time_utc = utc_datetime
         indicator.date_time_gmt_5 = gmt5_datetime
-
 
         self.db.commit()
 

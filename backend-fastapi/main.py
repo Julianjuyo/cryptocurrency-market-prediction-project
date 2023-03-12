@@ -6,7 +6,9 @@ import os
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 
 # FastAPI
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer
+
 
 # App
 from routers.exchange import exchange_router
@@ -17,6 +19,11 @@ from routers.indicator import indicator_router
 app = FastAPI()
 app.title = "Crypto currency market prediction Tesis"
 app.version = "0.0.1"
+
+# Securiry Auth 2
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
 
 # Include all the routers
 app.include_router(exchange_router)
@@ -33,3 +40,10 @@ app.add_middleware(DBSessionMiddleware, db_url=os.environ["DATABASE_URL"])
 @app.get(path="/", tags=['home'])
 async def home():
     return {"Cripto currency trading": "working"}
+
+
+# @app.get("/items/")
+# async def read_items(token: str = Depends(oauth2_scheme)):
+#     return {"token": token}
+
+

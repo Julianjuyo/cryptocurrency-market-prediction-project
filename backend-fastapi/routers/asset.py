@@ -1,11 +1,8 @@
 # Python
 from typing import List
-import json
-
 
 # FastAPI
 from fastapi import APIRouter
-from fastapi import Body
 from fastapi import Query
 from fastapi import Path
 from fastapi import status
@@ -19,7 +16,7 @@ from fastapi_sqlalchemy import db
 from schemas.asset import Asset
 from schemas.asset import UpdateAsset
 from services.asset import AssetService
-from models.asset import Asset as AssetModel
+# from models.asset import Asset as AssetModel
 
 
 asset_router = APIRouter()
