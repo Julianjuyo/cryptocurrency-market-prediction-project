@@ -1,6 +1,6 @@
 from models import Base
-
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from models.price import Price
+from sqlalchemy import Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
@@ -20,6 +20,8 @@ class Asset(Base):
     quote_asset = Column(String)
     interval = Column(String)
     asset_type = Column(String)
-    exchange_id = Column(String, ForeignKey("exchanges.id"))
 
-    exchange = relationship("exchanges")
+    prices = relationship("Price",  back_populates="asset_origin")
+
+    exchange_id = Column(UUID(as_uuid=True), ForeignKey("exchanges.id"))
+    exchange_origin = relationship("Exchange", back_populates="assets")
