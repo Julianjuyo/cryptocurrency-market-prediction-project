@@ -216,8 +216,10 @@ Temporary Items
 *.vsix
 
 backend-fastapi/env-fastapi
-
-
 backend-fastapi/.env
 
+
+
+frontend-streamlit/.env
+frontend-streamlit/env
 
