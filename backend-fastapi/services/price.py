@@ -7,6 +7,7 @@ from schemas.price import UpdatePrice
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_
+from sqlalchemy import desc
 
 
 class PriceService():
@@ -40,6 +41,23 @@ class PriceService():
 
         if not result:
             return {'error message': "The Price with the given id was not found"}
+
+        return result
+
+    def get_last_price_by_asset_id(self, asset_id: str):
+
+        asset = self.db.query(AssetModel).filter(
+            AssetModel.id == asset_id).first()
+
+        if not asset:
+            return {'error message': 'The Asset with the given id was not found'}
+
+        result = self.db.query(PriceModel).filter(
+
+            PriceModel.asset_id == asset_id).order_by(desc(PriceModel.unix_time)).first()
+
+        if not result:
+            return {'error message': "There are not prices for this asset"}
 
         return result
 

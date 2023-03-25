@@ -25,6 +25,9 @@ def get_all_prices_by_asset_id(asset_id: str = Path(min_length=36, max_length=36
 
     result = {"date":"2023-03-12T17:44:00.673514+00:00","close_price": 35000}
 
+    
+
+
     result_json = jsonable_encoder(result)
 
     if "error message" in result_json:

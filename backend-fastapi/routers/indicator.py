@@ -77,6 +77,25 @@ def get_indicators_between_unix_time_and_by_price_id(price_id: str = Path(min_le
     return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
 
 
+@indicator_router(
+    path='/prices/{price_id}/last_indicators/',
+    tags=['indicators'],
+    response_model=Indicator,
+    status_code=status.HTTP_200_OK,
+    summary="Get the last indicator of a price")
+def get_last_indicator_by_price_id(price_id: str = Path(min_length=36, max_length=36)) -> Indicator:
+
+    result = IndicatorService(
+        db.session).get_last_indicator_by_price_id(price_id)
+
+    result_json = jsonable_encoder(result)
+
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
+
+
 @indicator_router.get(
     path='/prices/{price_id}/indicators/',
     tags=['indicators'],

@@ -9,6 +9,7 @@ from schemas.indicator import UpdateIndicator
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_
+from sqlalchemy import desc
 
 
 class IndicatorService():
@@ -71,6 +72,22 @@ class IndicatorService():
 
         result = self.db.query(IndicatorModel).filter(
             IndicatorModel.id == indicator_id).first()
+
+        if not result:
+            return {'error message': "The Indicator with the given id was not found"}
+
+        return result
+
+    def get_last_indicator_by_price_id(self, price_id: str):
+
+        price = self.db.query(PriceModel).filter(
+            PriceModel.id == price_id).first()
+
+        if not price:
+            return {'error message': "The Price with the given id was not found"}
+
+        result = self.db.query(IndicatorModel).filter(
+            IndicatorModel.price_id == price_id).order_by(desc(IndicatorModel.unix_time)).first()
 
         if not result:
             return {'error message': "The Indicator with the given id was not found"}
