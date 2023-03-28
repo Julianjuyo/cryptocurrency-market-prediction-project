@@ -77,7 +77,7 @@ def get_indicators_between_unix_time_and_by_price_id(price_id: str = Path(min_le
     return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
 
 
-@indicator_router(
+@indicator_router.get(
     path='/prices/{price_id}/last_indicators/',
     tags=['indicators'],
     response_model=Indicator,
