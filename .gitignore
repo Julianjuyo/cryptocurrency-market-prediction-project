@@ -1,3 +1,5 @@
+
+
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
@@ -216,11 +218,16 @@ Temporary Items
 *.vsix
 
 backend-fastapi/env-fastapi
-
-
 backend-fastapi/.env
-
 
 data-analysis/final_dataset22
 
 data-analysis/year22_btcusdt_minute_final
+
+frontend-streamlit/.env
+frontend-streamlit/env
+
+data-loader/aux_folder
+
+data-loader/commodities
+

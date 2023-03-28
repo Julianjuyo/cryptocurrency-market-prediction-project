@@ -3,19 +3,16 @@ FROM python:3
 
 ENV PYTHONUNBUFFERED=1
 
-# RUN mkdir /backend-fastapi
+RUN mkdir /backend-fastapi
 
-# WORKDIR /backend-fastapi
+WORKDIR /backend-fastapi
 
-WORKDIR /fastapi
+COPY . /backend-fastapi/
 
-COPY requirements.txt requirements.txt
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-# COPY . /backend-fastapi/
-COPY . /fastapi
 
 ENV ON_DOCKER Yes
 

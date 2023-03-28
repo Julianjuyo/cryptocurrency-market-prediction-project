@@ -59,6 +59,24 @@ def get_all_prices_by_asset_id(asset_id: str = Path(min_length=36, max_length=36
 
 
 @price_router.get(
+    path='/assets/{asset_id}/last_price/',
+    tags=['prices'],
+    response_model=Price,
+    status_code=status.HTTP_200_OK,
+    summary="Get the last price of an asset")
+def get_last_price_by_asset_id(asset_id: str = Path(min_length=36, max_length=36)) -> Price:
+
+    result = PriceService(db.session).get_last_price_by_asset_id(asset_id)
+
+    result_json = jsonable_encoder(result)
+
+    if "error message" in result_json:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=result_json)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result_json)
+
+
+@price_router.get(
     path='/assets/{asset_id}/indicators_unix/',
     tags=['prices'],
     response_model=List[Price],
