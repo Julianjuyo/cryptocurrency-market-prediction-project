@@ -53,5 +53,6 @@ tzdata==2022.7
 tzlocal==4.2
 urllib3==1.26.14
 validators==0.20.0
-wordcloud==1.8.2.2
 zipp==3.12.0
+bokeh==2.4.3
+
