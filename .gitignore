@@ -225,6 +225,8 @@ backend-fastapi/.env
 frontend-streamlit/.env
 frontend-streamlit/env
 
+frontend-streamlit/pruebas
+
 data-loader/aux_folder
 
 data-loader/commodities
