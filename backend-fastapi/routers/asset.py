@@ -43,7 +43,7 @@ def create_asset_to_exchange(asset: Asset, exchange_id: str = Path(min_length=36
 
 
 @asset_router.get(
-    path='/exchange/{exchange_id}/asset/',
+    path='/exchanges/{exchange_id}/asset/',
     tags=['assets'],
     response_model=List[Asset],
 
