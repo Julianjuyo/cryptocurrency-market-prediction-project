@@ -127,7 +127,9 @@ def api_request_get_all_exchanges(base_url):
 def api_request_get_all_assets_from_exchange_id(base_url, exchange_id):
 
     try:
-        response = requests.get(base_url+"exchange/"+exchange_id+"/asset")
+        print(base_url)
+        response = requests.get(base_url+"exchanges/"+exchange_id+"/asset/")
+        print(response)
         json_data = json.loads(response.content)
         df = pd.json_normalize(json_data)
     except:
@@ -210,20 +212,31 @@ except:
     st.error("Error while make the http Request")
 
 
+
+
+
+
 if len(exchange) > 1:
 
     # Get the id of the selected_asset
     selected_exchange_id = exchanges_api.loc[exchanges_api['name']
                                              == exchange, "id"].iloc[0]
+
     selected_asset = " "
 
     try:
         # Get all the assets from that exchange
+        print("HOLA")
+        print(selected_exchange_id)
+
         assets_api = api_request_get_all_assets_from_exchange_id(
             base_url, selected_exchange_id)
+        
+        
         assets_api = pd.DataFrame(
             [[" ", " ", " ", " ", " ", " ", " ", " ", " "]], columns=assets_api.columns).append(assets_api)
 
+        print("AAAAAA"+assets_api)
         # Get the symbol of the asset
         asset_symbol = st.selectbox("Select the Asset", assets_api["symbol"].unique())
         selected_symbol = assets_api.loc[assets_api['symbol']
