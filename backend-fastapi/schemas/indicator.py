@@ -8,7 +8,7 @@ from pydantic import Field
 class Indicator(BaseModel):
 
     name: str = Field(..., min_length=1, example="RSI")
-    value: float = Field(..., example=12212)
+    value: Optional[float] = Field(None, example=12212)
     unix_time: int = Field(..., example=1673316847, gt=0)
 
     class Config:

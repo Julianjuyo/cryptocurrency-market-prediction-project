@@ -22,13 +22,18 @@ def main():
     asset = api_request_get_asset_from_asset_id(base_url,EXCHANGE_ID,ASSET_ID)
 
     # Get the last recorded price timestamp for the specified asset ID
-    last_timestamp = get_last_timestamp(base_url,ASSET_ID)
+    last_timestamp , first_report  = get_last_timestamp(base_url,ASSET_ID,asset["interval"].iloc[0])
 
     # Get the prices from the BINANCE API
     df_prices_final = get_data_from_api(symbol=asset["symbol"].iloc[0], interval=asset["interval"].iloc[0], initial_timestamp=last_timestamp, limit_timestamp=datetime.now().timestamp())
 
     # Upload the prices to the API
     upload_prices(df_prices_final,base_url,ASSET_ID)
+
+
+    df_with_indicators = get_full_prices_past( base_url, ASSET_ID, asset["interval"].iloc[0], last_timestamp, first_report)
+
+    upload_indicators(df_with_indicators,base_url,ASSET_ID)
 
 
 if __name__ == "__main__":
