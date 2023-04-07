@@ -3,6 +3,7 @@ from models.exchange import Exchange
 from models.price import Price
 from models.asset import Asset
 from models.indicator import Indicator
+from models.priceIndicator import priceIndicator
 
 
 def from_dict(dict, model_instance):
