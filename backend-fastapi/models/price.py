@@ -1,6 +1,5 @@
 from models import Base
-# from models.indicator import Indicator
-from models.priceIndicator import PriceIndicator
+from models.indicator import Indicator
 from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime, BigInteger
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
@@ -32,9 +31,4 @@ class Price(Base):
     asset_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"))
     asset_origin = relationship("Asset", back_populates='prices')
 
-
-    # indicators = relationship("Indicator",  back_populates="price_origin")
-
-    indicators = relationship('Indicator', secondary='priceIndicator', back_populates='prices')
-
-
+    indicators = relationship("Indicator",  back_populates="price_origin")

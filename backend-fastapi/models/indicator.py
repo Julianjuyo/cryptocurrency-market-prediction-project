@@ -1,6 +1,4 @@
 from models import Base
-from models.priceIndicator import PriceIndicator
-# from models.price import Price
 from sqlalchemy import Column, String, ForeignKey, DateTime, Float, BigInteger
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -21,8 +19,5 @@ class Indicator(Base):
     date_time_utc = Column(DateTime(timezone=True))
     date_time_gmt_5 = Column(DateTime(timezone=True))
 
-
-    # price_id = Column(UUID(as_uuid=True), ForeignKey("prices.id"))
-    # price_origin = relationship("Price", back_populates='indicators')
-
-    prices = relationship('Price', secondary='priceIndicator', back_populates='indicators')
+    price_id = Column(UUID(as_uuid=True), ForeignKey("prices.id"))
+    price_origin = relationship("Price", back_populates='indicators')
