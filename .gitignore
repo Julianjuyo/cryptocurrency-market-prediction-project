@@ -232,3 +232,6 @@ data-loader/aux_folder
 data-loader/commodities
 
 airflow/venv
+
+
+airflow/logs
