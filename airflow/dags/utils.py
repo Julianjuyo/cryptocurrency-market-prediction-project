@@ -77,10 +77,6 @@ def api_request_get_prices_between_unix_time(base_url, asset_id, unix_time_start
 
     print("entro api_request_get_prices_between_unix_time")
 
-    print("unix_time_start: " + str(unix_time_start))
-    print("unix_time_end: " + str(unix_time_end))
-    print("asset_id: " + str(asset_id))
-
     # try:
     # Make GET request to API endpoint with query parameters for start and end Unix timestamps
     response = requests.get(base_url + "assets/" + asset_id + "/indicators_unix_between/",
