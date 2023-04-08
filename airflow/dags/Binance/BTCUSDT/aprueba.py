@@ -18,6 +18,9 @@ def main():
     else:
         base_url = "http://0.0.0.0:5000/"
 
+    final_timestamp = int(datetime.now().timestamp())
+
+
     # Get the asset from the API
     asset = api_request_get_asset_from_asset_id(base_url,EXCHANGE_ID,ASSET_ID)
 
@@ -25,15 +28,22 @@ def main():
     last_timestamp , first_report  = get_last_timestamp(base_url,ASSET_ID,asset["interval"].iloc[0])
 
     # Get the prices from the BINANCE API
-    df_prices_final = get_data_from_api(symbol=asset["symbol"].iloc[0], interval=asset["interval"].iloc[0], initial_timestamp=last_timestamp, limit_timestamp=datetime.now().timestamp())
+    df_prices_final = get_data_from_api(symbol=asset["symbol"].iloc[0], interval=asset["interval"].iloc[0], initial_timestamp=last_timestamp, limit_timestamp=final_timestamp)
 
     # Upload the prices to the API
     upload_prices(df_prices_final,base_url,ASSET_ID)
 
+    df_with_indicators = get_full_prices_past( base_url, ASSET_ID, asset["interval"].iloc[0], last_timestamp, first_report,final_timestamp)
 
-    df_with_indicators = get_full_prices_past( base_url, ASSET_ID, asset["interval"].iloc[0], last_timestamp, first_report)
 
-    upload_indicators(df_with_indicators,base_url,ASSET_ID)
+    df_extra_assets_data = create_df_extra_assets_data(start_date=last_timestamp, end_date=final_timestamp)
+
+    df_final = pd.merge(df_with_indicators, df_extra_assets_data , on='timestamp_round_day', how='outer')
+
+    upload_indicators(df_final,base_url,ASSET_ID)
+
+
+
 
 
 if __name__ == "__main__":
