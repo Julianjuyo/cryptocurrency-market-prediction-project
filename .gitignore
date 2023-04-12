@@ -227,7 +227,13 @@ data-analysis/year22_btcusdt_minute_final
 frontend-streamlit/.env
 frontend-streamlit/env
 
+frontend-streamlit/pruebas
+
 data-loader/aux_folder
 
 data-loader/commodities
 
+airflow/venv
+
+
+airflow/logs

@@ -21,7 +21,7 @@ class Price(Base):
     close_price = Column(Float)
     low_price = Column(Float)
     high_price = Column(Float)
-    volume = Column(BigInteger)
+    volume = Column(Float)
     qav = Column(Float)
     num_trades = Column(BigInteger)
     taker_base_vol = Column(Float)

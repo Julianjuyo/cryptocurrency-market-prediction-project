@@ -24,7 +24,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
-      - "5050:80"
+      - "80:80"
 
     networks:
       - deploy_network
@@ -58,7 +58,7 @@ services:
     build: frontend-streamlit/
 
     ports:
-      - "8501:8501"
+      - "8081:8501"
 
     networks:
       - deploy_network
