@@ -40,7 +40,7 @@ def create_exchange(exchange: Exchange) -> Exchange:
 
 
 @exchange_router.get(
-    path='/exchanges',
+    path='/exchanges/',
     tags=['exchanges'],
     response_model=List[Exchange],
 

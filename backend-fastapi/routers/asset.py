@@ -23,7 +23,7 @@ asset_router = APIRouter()
 
 
 @asset_router.post(
-    path='/exchanges/{exchange_id}/asset',
+    path='/exchanges/{exchange_id}/asset/',
     tags=['assets'],
     response_model=Asset,
     status_code=status.HTTP_201_CREATED,
@@ -62,7 +62,7 @@ def get_assets_by_exchange_id(exchange_id: str = Path(min_length=36,max_length=3
 
 
 @asset_router.get(
-    path='/exchanges/{exchange_id}/asset_symbol',
+    path='/exchanges/{exchange_id}/asset_symbol/',
     tags=['assets'],
     response_model=Asset,
     status_code=status.HTTP_200_OK,
