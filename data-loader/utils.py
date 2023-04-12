@@ -1,4 +1,3 @@
-# import binance_extract
 
 from datetime import datetime, timezone
 import pandas as pd
@@ -11,6 +10,10 @@ import yfinance as yf
 
 BINANCE_URL = 'https://api.binance.com/api/v3/klines'
 
+PROXIES = {
+    'http': 'http://discproxy.virtual.uniandes.edu.co:443',
+}
+
 # Method to make API request to retrieve the last recorded price timestamp for a given asset ID
 
 
@@ -19,7 +22,8 @@ def api_request_last_time_stamp_from_asset_id(base_url, asset_id):
     print("entro api_request_last_time_stamp_from_asset_id")
 
     # Make GET request to API endpoint
-    response = requests.get(base_url + "assets/" + asset_id + "/last_price/")
+    response = requests.get(base_url + "assets/" +
+                            asset_id + "/last_price/", proxies=PROXIES)
 
     # Check if the request was successful
     if response.status_code == requests.codes.ok:
@@ -49,7 +53,7 @@ def api_request_get_asset_from_asset_id(base_url, exchange_id, asset_id):
     # Make GET request to API endpoint
 
     response = requests.get(base_url + "exchanges/" +
-                            exchange_id + "/asset/"+asset_id)
+                            exchange_id + "/asset/"+asset_id, proxies=PROXIES)
 
     # Check if the request was successful
     if response.status_code == requests.codes.ok:
@@ -80,7 +84,7 @@ def api_request_get_prices_between_unix_time(base_url, asset_id, unix_time_start
     # try:
     # Make GET request to API endpoint with query parameters for start and end Unix timestamps
     response = requests.get(base_url + "assets/" + asset_id + "/indicators_unix_between/",
-                            params={'unix_time_start': unix_time_start, 'unix_time_end': unix_time_end})
+                            params={'unix_time_start': unix_time_start, 'unix_time_end': unix_time_end}, proxies=PROXIES)
 
     print("status code time between: " + str(response.status_code))
 
@@ -109,22 +113,25 @@ def api_request_get_prices_between_unix_time(base_url, asset_id, unix_time_start
 def post_method(url_path, data_dict):
     # Convert the dictionary to a JSON string using the `json` module
     json_payload = json.dumps(data_dict)
+    print("data : "+json_payload)
+
     # try:
     # Send the POST request with the JSON payload
-    response = requests.post(url_path, data=json_payload)
+    response = requests.post(url_path, data=json_payload, proxies=PROXIES)
 
     # Check if the request was successful
     if response.status_code == requests.codes.created:
         # If successful, print the response content and convert it to a Pandas DataFrame
-        print("post status code: " + str(response.status_code))
+        # print("post status code: " + str(response.status_code))
 
-        print(response.content)
+        # print(response.content)
         json_data = json.loads(response.content)
         df = pd.json_normalize(json_data)
         return df
     else:
         # If unsuccessful, print the response content
         print("post status code: "+str(response.status_code))
+        print("failed: "+json_payload)
         print(response.content)
 
     # except:
@@ -211,7 +218,7 @@ def get_data_from_api(
         if initial_timestamp + 60 < limit_timestamp:
             print("Si se trae data")
             initial_timestamp = initial_timestamp + 60
-            limit_timestamp = limit_timestamp - 60
+            limit_timestamp = limit_timestamp - 62
         else:
             print("Finalizo y no hay datos")
             return df_prices
@@ -235,7 +242,7 @@ def get_data_from_api(
         if initial_timestamp + 3600 < limit_timestamp:
             print("Si se trae data")
             initial_timestamp = initial_timestamp + 3600
-            limit_timestamp = limit_timestamp - 3600
+            limit_timestamp = limit_timestamp - 3602
         else:
             print("Finalizo y no hay datos")
             return df_prices
@@ -259,7 +266,7 @@ def get_data_from_api(
         if initial_timestamp + 86400 < limit_timestamp:
             print("Si se trae data")
             initial_timestamp = initial_timestamp + 86400
-            limit_timestamp = limit_timestamp - 86400
+            limit_timestamp = limit_timestamp - 86402
         else:
             print("Finalizo y no hay datos")
             return df_prices
@@ -273,7 +280,7 @@ def get_data_from_api(
     loop_start_time = datetime.now()
 
     # Loop through API calls ---------------------------------------------------------------------------
-    while initial_timestamp <= limit_timestamp:
+    while initial_timestamp < limit_timestamp:
         print("Entro loop")
 
         # Set dates to Binance API format
@@ -474,10 +481,10 @@ def add_indicators(df):
 
     # df['psar_down'] = ta.trend.psar_down(close=df['close_price'],high=df['high_price'],low=df['low_price'])
     # df['psar_up'] = ta.trend.psar_up(close=df['close_price'],high=df['high_price'],low=df['low_price'])
-    df['psar_down_indicator'] = ta.trend.psar_down_indicator(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['psar_up_indicator'] = ta.trend.psar_up_indicator(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
+    # df['psar_down_indicator'] = ta.trend.psar_down_indicator(
+    #     close=df['close_price'], high=df['high_price'], low=df['low_price'])
+    # df['psar_up_indicator'] = ta.trend.psar_up_indicator(
+    #     close=df['close_price'], high=df['high_price'], low=df['low_price'])
 
     df['vi_pos'] = ta.trend.vortex_indicator_pos(
         close=df['close_price'], high=df['high_price'], low=df['low_price'])
@@ -515,6 +522,8 @@ def get_full_prices_past(base_url, asset_id, interval, last_timestamp, first_rep
     if first_report:
         print("first report")
         first_indicator_time = last_timestamp
+        timestamp_to_add = last_timestamp
+
     else:
         if interval == "minute":
             first_indicator_time = last_timestamp - 6000
@@ -546,7 +555,7 @@ def get_full_prices_past(base_url, asset_id, interval, last_timestamp, first_rep
 
 
 # Method to post the indicators to the API
-def upload_indicators(df_with_indicators, base_url, ASSET_ID):
+def upload_indicators(df_with_indicators, base_url):
 
     # loop through all rows and convert each row to a JSON object
 
@@ -560,18 +569,17 @@ def upload_indicators(df_with_indicators, base_url, ASSET_ID):
         # Iterate over the dictionary
         for key, value in row_dict.items():
             if math.isnan(value):
-                print("Value is nan")
                 data_dict = {
                     "name": key,
                     "unix_time": unix_time
                 }
             else:
-                print("Value is not nan")
                 data_dict = {
                     "name": key,
                     "value": value,
                     "unix_time": unix_time
                 }
+
             create_indicator_to_price_id(base_url, price_id, data_dict)
 
 
@@ -592,7 +600,7 @@ def get_extra_assets_data(start_date, end_date, name, ticker):
     df['timestamp_round_day'] = df['unix_time'].apply(round_day)
 
     df.drop(['Open', 'High', 'Low', 'Volume', 'Dividends',
-            'Stock Splits', 'Date'], axis=1, inplace=True)
+            'Stock Splits', 'Date', 'unix_time'], axis=1, inplace=True)
 
     df.rename(columns={'Close': name}, inplace=True)
 
@@ -640,4 +648,5 @@ def create_df_extra_assets_data(start_date, end_date):
                 start_date, end_date, name=key, ticker=value), on='timestamp_round_day', how='outer')
 
         count += 1
+
     return df_extra_assets_data
