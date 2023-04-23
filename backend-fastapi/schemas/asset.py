@@ -23,9 +23,9 @@ class Asset_type(str, Enum):
 
 class Asset(BaseModel):
 
-    symbol: str = Field(..., example="BTC/USD", min_length=1, max_length=25)
+    symbol: str = Field(..., example="BTCUSDT", min_length=1, max_length=25)
     base_asset: str = Field(..., example="BTC", min_length=1, max_length=20)
-    quote_asset: str = Field(..., example="USD", min_length=1, max_length=20)
+    quote_asset: str = Field(..., example="USDT", min_length=1, max_length=20)
     interval: IntervalAsset = Field(..., example=IntervalAsset.minute)
     asset_type: Asset_type = Field(..., example=Asset_type.Cryptocurrency)
 
