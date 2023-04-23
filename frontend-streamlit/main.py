@@ -212,10 +212,6 @@ except:
     st.error("Error while make the http Request")
 
 
-
-
-
-
 if len(exchange) > 1:
 
     # Get the id of the selected_asset
