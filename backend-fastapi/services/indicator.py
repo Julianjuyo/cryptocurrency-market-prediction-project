@@ -103,10 +103,8 @@ class IndicatorService():
             return {'error message': "The Price with the given id was not found"}
 
         result = self.db.query(IndicatorModel).filter(and_(
-            IndicatorModel.unix_time == price.unix_time, IndicatorModel.name == indicator.name, IndicatorModel.price_id == price_id)).first()
+            IndicatorModel.unix_time == price.unix_time, IndicatorModel.price_id == price_id)).first()
 
-        if result:
-            return {'error message': 'The Price in the give unix_time and name allready exists'}
 
         if price.unix_time != indicator.unix_time:
 

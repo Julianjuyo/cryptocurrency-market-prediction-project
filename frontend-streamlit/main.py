@@ -113,7 +113,7 @@ def api_request_get_all_exchanges(base_url):
 
     try:
 
-        response = requests.get(base_url+"exchanges")
+        response = requests.get(base_url+"exchanges/")
         json_data = json.loads(response.content)
         df = pd.json_normalize(json_data)
         return df
@@ -210,10 +210,6 @@ try:
 
 except:
     st.error("Error while make the http Request")
-
-
-
-
 
 
 if len(exchange) > 1:

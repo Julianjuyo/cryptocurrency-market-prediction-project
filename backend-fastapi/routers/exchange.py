@@ -40,7 +40,7 @@ def create_exchange(exchange: Exchange) -> Exchange:
 
 
 @exchange_router.get(
-    path='/exchanges',
+    path='/exchanges/',
     tags=['exchanges'],
     response_model=List[Exchange],
 
@@ -59,7 +59,7 @@ def get_exchanges() -> List[Exchange]:
 
 
 @exchange_router.get(
-    path='/exchanges/',
+    path='/exchanges/name/',
     tags=['exchanges'],
     response_model=List[Exchange],
     status_code=status.HTTP_200_OK,

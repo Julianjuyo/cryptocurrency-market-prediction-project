@@ -38,7 +38,7 @@ load_dotenv(".env")
 app.add_middleware(DBSessionMiddleware, db_url=os.environ["DATABASE_URL"])
 
 
-@app.get(path="/", tags=['home'])
+@app.get(path="/", tags=["home"])
 async def home():
     return {"Cripto currency trading": "working"}
 
@@ -46,3 +46,4 @@ async def home():
 # @app.get("/items/")
 # async def read_items(token: str = Depends(oauth2_scheme)):
 #     return {"token": token}
+
