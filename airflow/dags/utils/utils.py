@@ -6,9 +6,12 @@ import json
 import ta
 import math
 import yfinance as yf
+from joblib import Parallel, delayed
 
 
 BINANCE_URL = 'https://api.binance.com/api/v3/klines'
+
+NUM_CORES = 4
 
 PROXIES = {
     'http': 'http://discproxy.virtual.uniandes.edu.co:443',
@@ -22,8 +25,7 @@ def api_request_last_time_stamp_from_asset_id(base_url, asset_id):
     print("entro api_request_last_time_stamp_from_asset_id")
 
     # Make GET request to API endpoint
-    response = requests.get(base_url + "assets/" +
-                            asset_id + "/last_price/", proxies=PROXIES)
+    response = requests.get(base_url + "assets/" + asset_id + "/last_price/",proxies=PROXIES)
 
     # Check if the request was successful
     if response.status_code == requests.codes.ok:
@@ -53,7 +55,7 @@ def api_request_get_asset_from_asset_id(base_url, exchange_id, asset_id):
     # Make GET request to API endpoint
 
     response = requests.get(base_url + "exchanges/" +
-                            exchange_id + "/asset/"+asset_id, proxies=PROXIES)
+                            exchange_id + "/asset/"+asset_id ,proxies=PROXIES)
 
     # Check if the request was successful
     if response.status_code == requests.codes.ok:
@@ -84,7 +86,7 @@ def api_request_get_prices_between_unix_time(base_url, asset_id, unix_time_start
     # try:
     # Make GET request to API endpoint with query parameters for start and end Unix timestamps
     response = requests.get(base_url + "assets/" + asset_id + "/indicators_unix_between/",
-                            params={'unix_time_start': unix_time_start, 'unix_time_end': unix_time_end}, proxies=PROXIES)
+                            params={'unix_time_start': unix_time_start, 'unix_time_end': unix_time_end},proxies= PROXIES)
 
     print("status code time between: " + str(response.status_code))
 
@@ -117,7 +119,7 @@ def post_method(url_path, data_dict):
 
     # try:
     # Send the POST request with the JSON payload
-    response = requests.post(url_path, data=json_payload, proxies=PROXIES)
+    response = requests.post(url_path, data=json_payload ,proxies= PROXIES)
 
     # Check if the request was successful
     if response.status_code == requests.codes.created:
@@ -148,7 +150,20 @@ def create_price_to_asset_id(base_url, asset_id, data_dict):
 # Method to create a new indicator for a given price ID
 
 
-def create_indicator_to_price_id(base_url, price_id, data_dict):
+def create_indicator_to_price_id(base_url, price_id, unix_time, key, value):
+
+    if math.isnan(value):
+        data_dict = {
+            "name": key,
+            "unix_time": unix_time
+        }
+    else:
+        data_dict = {
+            "name": key,
+            "value": value,
+            "unix_time": unix_time
+        }
+
     # Call the `post_method` function with the appropriate URL and data dictionary
     return post_method(base_url + "prices/" + price_id + "/indicators/", data_dict)
 
@@ -357,141 +372,134 @@ def get_last_timestamp(base_url, asset_id, interval):
     return last_timestamp, first_report
 
 
-# method to add the thecnic indicators to the dataframe
-def add_indicators(df):
+# # method to add the thecnic indicators to the dataframe
+# def add_indicators(df):
 
-    # momentum
-    df['ao'] = ta.momentum.awesome_oscillator(
-        high=df['high_price'], low=df['low_price'])
-    df['kama'] = ta.momentum.kama(close=df['close_price'])
-    df['ppo'] = ta.momentum.ppo(close=df['close_price'])
-    df['pvo'] = ta.momentum.pvo(volume=df['volume'])
-    df['roc'] = ta.momentum.roc(close=df['close_price'])
-    df['rsi'] = ta.momentum.rsi(close=df['close_price'])
-    df['stochrsi'] = ta.momentum.stochrsi(close=df['close_price'])
-    df['stoch'] = ta.momentum.stoch(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['tsi'] = ta.momentum.tsi(close=df['close_price'])
-    df['uo'] = ta.momentum.ultimate_oscillator(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['wri'] = ta.momentum.williams_r(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     # momentum
+#     df['ao'] = ta.momentum.awesome_oscillator(
+#         high=df['high_price'], low=df['low_price'])
+#     df['kama'] = ta.momentum.kama(close=df['close_price'])
+#     df['ppo'] = ta.momentum.ppo(close=df['close_price'])
+#     df['pvo'] = ta.momentum.pvo(volume=df['volume'])
+#     df['roc'] = ta.momentum.roc(close=df['close_price'])
+#     df['rsi'] = ta.momentum.rsi(close=df['close_price'])
+#     df['stochrsi'] = ta.momentum.stochrsi(close=df['close_price'])
+#     df['stoch'] = ta.momentum.stoch(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['tsi'] = ta.momentum.tsi(close=df['close_price'])
+#     df['uo'] = ta.momentum.ultimate_oscillator(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['wri'] = ta.momentum.williams_r(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
 
-    # volume
-    df['accdist'] = ta.volume.acc_dist_index(
-        high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
-    df['cmf'] = ta.volume.chaikin_money_flow(
-        high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
-    df['emv'] = ta.volume.ease_of_movement(
-        high=df['high_price'], low=df['low_price'], volume=df['volume'])
-    df['fi'] = ta.volume.force_index(
-        close=df['close_price'], volume=df['volume'])
-    df['mfi'] = ta.volume.money_flow_index(
-        high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
-    df['nvi'] = ta.volume.negative_volume_index(
-        close=df['close_price'], volume=df['volume'])
-    df['obv'] = ta.volume.on_balance_volume(
-        close=df['close_price'], volume=df['volume'])
-    df['smaemv'] = ta.volume.sma_ease_of_movement(
-        high=df['high_price'], low=df['low_price'], volume=df['volume'])
-    df['vpt'] = ta.volume.volume_price_trend(
-        close=df['close_price'], volume=df['volume'])
-    df['vwap'] = ta.volume.volume_weighted_average_price(
-        high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
+#     # volume
+#     df['accdist'] = ta.volume.acc_dist_index(
+#         high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
+#     df['cmf'] = ta.volume.chaikin_money_flow(
+#         high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
+#     df['emv'] = ta.volume.ease_of_movement(
+#         high=df['high_price'], low=df['low_price'], volume=df['volume'])
+#     df['fi'] = ta.volume.force_index(
+#         close=df['close_price'], volume=df['volume'])
+#     df['mfi'] = ta.volume.money_flow_index(
+#         high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
+#     df['nvi'] = ta.volume.negative_volume_index(
+#         close=df['close_price'], volume=df['volume'])
+#     df['obv'] = ta.volume.on_balance_volume(
+#         close=df['close_price'], volume=df['volume'])
+#     df['smaemv'] = ta.volume.sma_ease_of_movement(
+#         high=df['high_price'], low=df['low_price'], volume=df['volume'])
+#     df['vpt'] = ta.volume.volume_price_trend(
+#         close=df['close_price'], volume=df['volume'])
+#     df['vwap'] = ta.volume.volume_weighted_average_price(
+#         high=df['high_price'], low=df['low_price'], close=df['close_price'], volume=df['volume'])
 
-    # volatility
-    df['atr'] = ta.volatility.average_true_range(
-        high=df['high_price'], low=df['low_price'], close=df['close_price'])
-    df['ulcer'] = ta.volatility.ulcer_index(close=df['close_price'])
+#     # volatility
+#     df['atr'] = ta.volatility.average_true_range(
+#         high=df['high_price'], low=df['low_price'], close=df['close_price'])
+#     df['ulcer'] = ta.volatility.ulcer_index(close=df['close_price'])
 
-    df['bbh'] = ta.volatility.bollinger_hband(close=df['close_price'])
-    df['bbl'] = ta.volatility.bollinger_lband(close=df['close_price'])
-    df['bbhi'] = ta.volatility.bollinger_hband_indicator(
-        close=df['close_price'])
-    df['bbli'] = ta.volatility.bollinger_lband_indicator(
-        close=df['close_price'])
-    df['bbmavg'] = ta.volatility.bollinger_mavg(close=df['close_price'])
-    df['bb_pb'] = ta.volatility.bollinger_pband(close=df['close_price'])
-    df['bb_wb'] = ta.volatility.bollinger_wband(close=df['close_price'])
+#     df['bbh'] = ta.volatility.bollinger_hband(close=df['close_price'])
+#     df['bbl'] = ta.volatility.bollinger_lband(close=df['close_price'])
+#     df['bbhi'] = ta.volatility.bollinger_hband_indicator(
+#         close=df['close_price'])
+#     df['bbli'] = ta.volatility.bollinger_lband_indicator(
+#         close=df['close_price'])
+#     df['bbmavg'] = ta.volatility.bollinger_mavg(close=df['close_price'])
+#     df['bb_pb'] = ta.volatility.bollinger_pband(close=df['close_price'])
+#     df['bb_wb'] = ta.volatility.bollinger_wband(close=df['close_price'])
 
-    df['dchb'] = ta.volatility.donchian_channel_hband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['dclb'] = ta.volatility.donchian_channel_lband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['dcmb'] = ta.volatility.donchian_channel_mband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['dcpb'] = ta.volatility.donchian_channel_pband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['dcwb'] = ta.volatility.donchian_channel_wband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['dchb'] = ta.volatility.donchian_channel_hband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['dclb'] = ta.volatility.donchian_channel_lband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['dcmb'] = ta.volatility.donchian_channel_mband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['dcpb'] = ta.volatility.donchian_channel_pband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['dcwb'] = ta.volatility.donchian_channel_wband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
 
-    df['kchb'] = ta.volatility.keltner_channel_hband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['kclb'] = ta.volatility.keltner_channel_lband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['kchbi'] = ta.volatility.keltner_channel_hband_indicator(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['kclbi'] = ta.volatility.keltner_channel_lband_indicator(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['kcmb'] = ta.volatility.keltner_channel_mband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['kcpb'] = ta.volatility.keltner_channel_pband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['kcwb'] = ta.volatility.keltner_channel_wband(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kchb'] = ta.volatility.keltner_channel_hband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kclb'] = ta.volatility.keltner_channel_lband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kchbi'] = ta.volatility.keltner_channel_hband_indicator(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kclbi'] = ta.volatility.keltner_channel_lband_indicator(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kcmb'] = ta.volatility.keltner_channel_mband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kcpb'] = ta.volatility.keltner_channel_pband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['kcwb'] = ta.volatility.keltner_channel_wband(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
 
-    # trend
+#     # trend
 
-    # En dos de estos tres hay algo que esta botando warning
-    df['adx'] = ta.trend.adx(close=df['close_price'],
-                             high=df['high_price'], low=df['low_price'])
-    df['adx_neg'] = ta.trend.adx_neg(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['adx_pos'] = ta.trend.adx_pos(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     # En dos de estos tres hay algo que esta botando warning
+#     df['adx'] = ta.trend.adx(close=df['close_price'],
+#                              high=df['high_price'], low=df['low_price'])
+#     df['adx_neg'] = ta.trend.adx_neg(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['adx_pos'] = ta.trend.adx_pos(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
 
-    df['aroon_up'] = ta.trend.aroon_up(close=df['close_price'])
-    df['aroon_down'] = ta.trend.aroon_down(close=df['close_price'])
+#     df['aroon_up'] = ta.trend.aroon_up(close=df['close_price'])
+#     df['aroon_down'] = ta.trend.aroon_down(close=df['close_price'])
 
-    df['cci'] = ta.trend.cci(close=df['close_price'],
-                             high=df['high_price'], low=df['low_price'])
-    df['dpo'] = ta.trend.dpo(close=df['close_price'])
-    df['kst'] = ta.trend.kst(close=df['close_price'])
-    df['kst_sig'] = ta.trend.kst_sig(close=df['close_price'])
-    df['ema'] = ta.trend.ema_indicator(close=df['close_price'])
+#     df['cci'] = ta.trend.cci(close=df['close_price'],
+#                              high=df['high_price'], low=df['low_price'])
+#     df['dpo'] = ta.trend.dpo(close=df['close_price'])
+#     df['kst'] = ta.trend.kst(close=df['close_price'])
+#     df['kst_sig'] = ta.trend.kst_sig(close=df['close_price'])
+#     df['ema'] = ta.trend.ema_indicator(close=df['close_price'])
 
-    df['ichimoku_a'] = ta.trend.ichimoku_a(
-        high=df['high_price'], low=df['low_price'])
-    df['ichimoku_b'] = ta.trend.ichimoku_b(
-        high=df['high_price'], low=df['low_price'])
-    df['ichimoku_base_line'] = ta.trend.ichimoku_base_line(
-        high=df['high_price'], low=df['low_price'])
-    df['ichimoku_conversion_line'] = ta.trend.ichimoku_conversion_line(
-        high=df['high_price'], low=df['low_price'])
+#     df['ichimoku_a'] = ta.trend.ichimoku_a(
+#         high=df['high_price'], low=df['low_price'])
+#     df['ichimoku_b'] = ta.trend.ichimoku_b(
+#         high=df['high_price'], low=df['low_price'])
+#     df['ichimoku_base_line'] = ta.trend.ichimoku_base_line(
+#         high=df['high_price'], low=df['low_price'])
+#     df['ichimoku_conversion_line'] = ta.trend.ichimoku_conversion_line(
+#         high=df['high_price'], low=df['low_price'])
 
-    df['macd'] = ta.trend.macd(close=df['close_price'])
-    df['macd_diff'] = ta.trend.macd_diff(close=df['close_price'])
-    df['macd_signal'] = ta.trend.macd_signal(close=df['close_price'])
+#     df['macd'] = ta.trend.macd(close=df['close_price'])
+#     df['macd_diff'] = ta.trend.macd_diff(close=df['close_price'])
+#     df['macd_signal'] = ta.trend.macd_signal(close=df['close_price'])
 
-    df['mi'] = ta.trend.mass_index(high=df['high_price'], low=df['low_price'])
-    df['sma'] = ta.trend.sma_indicator(close=df['close_price'])
-    df['wma'] = ta.trend.wma_indicator(close=df['close_price'])
-    df['stc'] = ta.trend.stc(close=df['close_price'])
-    df['trix'] = ta.trend.trix(close=df['close_price'])
+#     df['mi'] = ta.trend.mass_index(high=df['high_price'], low=df['low_price'])
+#     df['sma'] = ta.trend.sma_indicator(close=df['close_price'])
+#     df['wma'] = ta.trend.wma_indicator(close=df['close_price'])
+#     df['stc'] = ta.trend.stc(close=df['close_price'])
+#     df['trix'] = ta.trend.trix(close=df['close_price'])
 
-    # df['psar_down'] = ta.trend.psar_down(close=df['close_price'],high=df['high_price'],low=df['low_price'])
-    # df['psar_up'] = ta.trend.psar_up(close=df['close_price'],high=df['high_price'],low=df['low_price'])
-    # df['psar_down_indicator'] = ta.trend.psar_down_indicator(
-    #     close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    # df['psar_up_indicator'] = ta.trend.psar_up_indicator(
-    #     close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['vi_pos'] = ta.trend.vortex_indicator_pos(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
+#     df['vi_neg'] = ta.trend.vortex_indicator_neg(
+#         close=df['close_price'], high=df['high_price'], low=df['low_price'])
 
-    df['vi_pos'] = ta.trend.vortex_indicator_pos(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-    df['vi_neg'] = ta.trend.vortex_indicator_neg(
-        close=df['close_price'], high=df['high_price'], low=df['low_price'])
-
-    return df
+#     return df
 
 
 def upload_prices(df_prices, base_url, asset_id):
@@ -500,11 +508,13 @@ def upload_prices(df_prices, base_url, asset_id):
         print("There are NO prices to upload")
     else:
         print("There are prices to upload")
-        # loop through all rows and convert each row to a JSON object
-        for index, row in df_prices.iterrows():
 
-            row_dict = row.to_dict()
-            resp = create_price_to_asset_id(base_url, asset_id, row_dict)
+        # make multiple POST requests in parallel using joblib
+        num_cores = NUM_CORES  # number of CPU cores to use
+        # convert dataframe to list of dictionaries
+        data_list = df_prices.to_dict('records')
+        results = Parallel(n_jobs=num_cores)(delayed(create_price_to_asset_id)(
+            base_url, asset_id, data) for data in data_list)
 
     print("DONE upload_prices")
 
@@ -539,7 +549,7 @@ def get_full_prices_past(base_url, asset_id, interval, last_timestamp, first_rep
     df_prices = api_request_get_prices_between_unix_time(
         base_url, asset_id, first_indicator_time, final_timestamp)
 
-    df_prices_wit_indicators = add_indicators(df_prices)
+    df_prices_wit_indicators = df_prices  # add_indicators(df_prices)
 
     df_prices_wit_indicators.drop(['low_price', 'asset_id', 'updated_at', 'high_price', 'volume', 'date_time_utc', 'qav', 'date_time_gmt_5',
                                   'num_trades', 'open_price', 'taker_base_vol', 'close_price', 'taker_quote_vol', 'created_at', 'ignore'], axis=1, inplace=True)
@@ -566,21 +576,10 @@ def upload_indicators(df_with_indicators, base_url):
         unix_time = row_dict["unix_time"]
         del row_dict['unix_time']
         del row_dict['id']
-        # Iterate over the dictionary
-        for key, value in row_dict.items():
-            if math.isnan(value):
-                data_dict = {
-                    "name": key,
-                    "unix_time": unix_time
-                }
-            else:
-                data_dict = {
-                    "name": key,
-                    "value": value,
-                    "unix_time": unix_time
-                }
 
-            create_indicator_to_price_id(base_url, price_id, data_dict)
+        num_cores = NUM_CORES  # number of CPU cores to use
+        results = Parallel(n_jobs=num_cores)(delayed(create_indicator_to_price_id)(
+            base_url, price_id, unix_time, key, value) for key, value in row_dict.items())
 
 
 def get_extra_assets_data(start_date, end_date, name, ticker):

@@ -15,14 +15,14 @@ from airflow.operators.dummy import DummyOperator
 
 
 EXCHANGE_ID = "ed14a82e-fbb3-43ed-af33-cb8d99459d39"
-BTCUSDT_DAY_ID = "558bb12a-b0a3-463a-a01d-5019fbf353ba"
+BNBUSDT_DAY_ID = "e6bd7a29-c2e5-458e-8302-7afc0433f0c6"
 
 
 def main():
 
     base_url = "http://172.24.100.128:5000/"
 
-    ASSET_ID = BTCUSDT_DAY_ID
+    ASSET_ID = BNBUSDT_DAY_ID
     
     print("asset: "+ASSET_ID)
 
@@ -66,12 +66,12 @@ default_args = {
 
 
 with DAG(
-     	dag_id ="BTCUSDT_historic_day",
+     	dag_id ="BNBUSDT_historic_day",
         default_args = default_args,
-		description="Upload information of BTCUSDT historic with day interval",
+		description="Upload information of BNBUSDT historic with day interval",
 		schedule_interval="0 7 * * *",
 		catchup = False,
-        tags = ['BTCUSDT', 'day']
+        tags = ['BNBUSDT', 'day']
 
 ) as dag:
         
