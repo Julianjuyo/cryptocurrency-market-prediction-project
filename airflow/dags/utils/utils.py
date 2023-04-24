@@ -3,9 +3,9 @@ from datetime import datetime, timezone
 import pandas as pd
 import requests
 import json
-import ta
 import math
 import yfinance as yf
+from joblib import Parallel, delayed 
 
 
 BINANCE_URL = 'https://api.binance.com/api/v3/klines'
@@ -445,6 +445,8 @@ def upload_indicators(df_with_indicators, base_url):
 
     results = Parallel(n_jobs=num_cores)(
         delayed(create_indicator_to_price_id)(base_url, data) for data in data_list)
+    
+    print("DONE upload_indicators")
 
 
 def get_extra_assets_data(start_date, end_date, name, ticker):

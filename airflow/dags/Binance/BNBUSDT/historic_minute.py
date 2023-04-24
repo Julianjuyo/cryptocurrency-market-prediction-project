@@ -13,13 +13,10 @@ from airflow import DAG
 from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
 from airflow.operators.dummy import DummyOperator
 
-# Add 'utils' directory to the Python path
-sys.path.append('/opt/airflow/dags/utils/')
 
 
-EXCHANGE_ID = "ed14a82e-fbb3-43ed-af33-cb8d99459d39"
-BNBUSDT_MINUTE_ID = "ec51c55e-4e60-4386-9498-b53d06189a30"
-
+EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
+BNBUSDT_MINUTE_ID = "9a5e2374-d3b7-4408-9860-7a8fa34ac27e"
 
 def main():
 
