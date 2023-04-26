@@ -14,8 +14,8 @@ from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
 from airflow.operators.dummy import DummyOperator
 
 
-EXCHANGE_ID = "ed14a82e-fbb3-43ed-af33-cb8d99459d39"
-BNBUSDT_HOUR_ID = "e4186eef-f39b-4746-9605-5e957c330ca3"
+EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
+BNBUSDT_HOUR_ID = "133d649a-06cb-43bf-960f-f3f5fa638af1"
 
 
 def main():

@@ -9,20 +9,16 @@ from utils import api_request_get_asset_from_asset_id, get_last_timestamp, get_d
 from datetime import datetime , timedelta
 import pandas as pd
 
-from airflow import DAG
-from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
-from airflow.operators.dummy import DummyOperator
 
 
 EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-BNBUSDT_DAY_ID = "d2ef1f0c-8842-4c75-8dc1-61e5410e511b"
-
+BNBUSDT_HOUR_ID = "133d649a-06cb-43bf-960f-f3f5fa638af1"
 
 def main():
 
     base_url = "http://172.24.100.128:5000/"
 
-    ASSET_ID = BNBUSDT_DAY_ID
+    ASSET_ID = BNBUSDT_HOUR_ID
     
     print("asset: "+ASSET_ID)
 
@@ -52,37 +48,6 @@ def main():
     upload_indicators(df_final,base_url)
 
 
-default_args = {
-    'owner': 'Julian Oliveros',
-    'depends_on_past': False,
-    'email': ['je.oliverosf@uniandes.edu.co'],
-    'email_on_failure': True,
-    'email_on_retry': False,
-    'retries': 0,
-    'retry_delay': timedelta(minutes=5),
-    'start_date': datetime(2021, 1, 30),
-    # 'on_failure_callback':send_error
-}
+if __name__ == "__main__":
 
-
-with DAG(
-     	dag_id ="BNBUSDT_historic_day",
-        default_args = default_args,
-		description="Upload information of BNBUSDT historic with day interval",
-		schedule_interval="0 7 * * *",
-		catchup = False,
-        tags = ['BNBUSDT', 'day']
-
-) as dag:
-        
-	start = DummyOperator(task_id="start") 
-
-
-	upload_prices_data = PythonOperator(
-				task_id ="upload_prices_data",
-				python_callable = main,
-                dag=dag)
-
-	end = DummyOperator(task_id="end") 
-
-	start >> upload_prices_data >> end
+    main()
