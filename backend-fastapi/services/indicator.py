@@ -101,17 +101,21 @@ class IndicatorService():
 
         if not price:
             return {'error message': "The Price with the given id was not found"}
+        
+        if price.unix_time != indicator.unix_time:
+
+            return {'error message': 'The Price unixTime and the indicator UnixTime are not the same'}
+        
 
         result = self.db.query(IndicatorModel).filter(and_(
             IndicatorModel.unix_time == price.unix_time, IndicatorModel.price_id == price_id)).first()
 
+        if result and result.unix_time == indicator.unix_time and result.price_id == price_id:
 
-        if price.unix_time != indicator.unix_time:
+            return {'error message': 'The unixTime with the given indicator already exists'}
 
-            return {'error message': 'The Price unixTime and the indicator UnixTime are not the same'}
 
         new_indicator = IndicatorModel(**indicator.dict())
-
         new_indicator.price_id = price_id
         utc_datetime, gmt5_datetime = convert_unix_time(
             new_indicator.unix_time)
