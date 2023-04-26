@@ -108,9 +108,9 @@ class IndicatorService():
         
 
         result = self.db.query(IndicatorModel).filter(and_(
-            IndicatorModel.unix_time == price.unix_time, IndicatorModel.price_id == price_id)).first()
+            IndicatorModel.unix_time == indicator.unix_time, IndicatorModel.price_id == price_id)).first()
 
-        if result and result.unix_time == indicator.unix_time and result.price_id == price_id:
+        if result:
 
             return {'error message': 'The unixTime with the given indicator already exists'}
 
