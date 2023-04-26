@@ -13,17 +13,14 @@ from airflow import DAG
 from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
 from airflow.operators.dummy import DummyOperator
 
-
-
 EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-BTCUSDT_MINUTE_ID = "bbf9f332-a499-4473-8095-9c17923556f6"
-
+ADAUSDT_MINUTE_ID = "105717ac-e8d5-4b1d-977d-6cc70d5d7ab8"
 
 def main():
 
     base_url = "http://172.24.100.128:5000/"
 
-    ASSET_ID = BTCUSDT_MINUTE_ID
+    ASSET_ID = ADAUSDT_MINUTE_ID
 
     print("asset: "+ASSET_ID)
 
@@ -72,12 +69,12 @@ default_args = {
 
 
 with DAG(
-        dag_id="BTCUSDT_historic_minute",
+        dag_id="ADAUSDT_historic_minute",
         default_args=default_args,
-        description="Upload information of BTCUSDT historic with day interval",
+        description="Upload information of ADAUSDT historic with day interval",
         schedule_interval="0 */2 * * *",
         catchup=False,
-        tags=['BTCUSDT', 'minute']
+        tags=['ADAUSDT', 'minute']
 
 ) as dag:
 

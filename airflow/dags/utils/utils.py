@@ -5,12 +5,12 @@ import requests
 import json
 import math
 import yfinance as yf
-from joblib import Parallel, delayed 
+from joblib import Parallel, delayed
 
 
 BINANCE_URL = 'https://api.binance.com/api/v3/klines'
 
-NUM_CORES = 4
+NUM_CORES = 6
 
 PROXIES = {
     'http': 'http://discproxy.virtual.uniandes.edu.co:443',
@@ -323,6 +323,8 @@ def get_data_from_api(
 
     time = loop_end_time - loop_start_time
 
+    df_prices = df_prices.drop_duplicates()
+    
     print('DONE', '\nDURATION:', time.days, 'DAYS', time.seconds//3600, 'HOURS',
           (time.seconds//60) % 60, 'MINUTES', time.seconds % 60, 'SECONDS.')
     print('API CALLS:', counter, ' ROWS:', len(df_prices))
@@ -335,6 +337,8 @@ def get_data_from_api(
 
     df_prices['unix_time'] = df_prices['unix_time'].apply(
         lambda x: int(round(x / 1000)))
+    
+    
 
     return df_prices
 
@@ -357,11 +361,11 @@ def get_last_timestamp(base_url, asset_id, interval):
             first_report = True
 
             if interval == "minute":
-                last_timestamp = 1638230400  # 30 of november 2021
+                last_timestamp = 1675123200  # 31 of enero 2023
             if interval == "hour":
-                last_timestamp = 1638230400  # 30 of november 2021
+                last_timestamp = 1672099200  # 26 of dicember 2022
             if interval == "day":
-                last_timestamp = 1630368000  # 31 of august 2021
+                last_timestamp = 1661904000  # 31 of august 2022
 
         elif last_timestamp_response["error message"].iloc[0] == "The Asset with the given id was not found":
             print("The Asset with the given id was not found")
@@ -445,7 +449,7 @@ def upload_indicators(df_with_indicators, base_url):
 
     results = Parallel(n_jobs=num_cores)(
         delayed(create_indicator_to_price_id)(base_url, data) for data in data_list)
-    
+
     print("DONE upload_indicators")
 
 
