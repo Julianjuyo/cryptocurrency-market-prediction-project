@@ -220,7 +220,9 @@ Temporary Items
 backend-fastapi/env-fastapi
 backend-fastapi/.env
 
+data-analysis/final_dataset22
 
+data-analysis/year22_btcusdt_minute_final
 
 frontend-streamlit/.env
 frontend-streamlit/env
@@ -238,3 +240,8 @@ data-loader/env-fastapi
 
 
 airflow/logs
+
+
+data_science/data/.csv
+
+data_science/data
