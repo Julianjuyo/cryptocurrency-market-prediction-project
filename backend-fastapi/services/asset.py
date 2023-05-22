@@ -36,9 +36,21 @@ class AssetService():
             AssetModel.id == asset_id).first()
 
         if not result:
-            return {'error message': "The exchange with the given id was not found"}
+            return {'error message': "The asset with the given id was not found"}
 
         return result
+
+
+    def get_asset_by_id(self,  asset_id: str):
+
+        result = self.db.query(AssetModel).filter(
+            AssetModel.id == asset_id).first()
+
+        if not result:
+            return {'error message': "The asset with the given id was not found"}
+
+        return result
+    
 
     def get_asset_by_symbol(self, symbol: str):
 
