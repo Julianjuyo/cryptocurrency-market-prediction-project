@@ -74,8 +74,7 @@ with DAG(
         dag_id="ETHUSDT_historic_minute",
         default_args=default_args,
         description="Upload information of ETHUSDT historic with day interval",
-        #schedule_interval="0 */2 * * *",
-        schedule_interval="@once",
+        schedule_interval="0 */2 * * *",
         catchup=False,
         tags=['ETHUSDT', 'minute']
 

@@ -73,10 +73,9 @@ default_args = {
 with DAG(
         dag_id="BNBUSDT_historic_minute",
         default_args=default_args,
-    description="Upload information of BNBUSDT historic with day interval",
-    # schedule_interval="0 */2 * * *",
-        schedule_interval="@once",
-                catchup=False,
+        description="Upload information of BNBUSDT historic with day interval",
+        schedule_interval="0 */2 * * *",
+        catchup=False,
         tags=['BNBUSDT', 'minute']
 
 ) as dag:

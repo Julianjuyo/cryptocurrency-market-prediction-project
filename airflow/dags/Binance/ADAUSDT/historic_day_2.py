@@ -1,29 +1,25 @@
+from datetime import datetime, timedelta
+from airflow.operators.dummy import DummyOperator
+from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
+from airflow import DAG
+import pandas as pd
+from utils import api_request_get_asset_from_asset_id, get_last_timestamp, get_data_from_api, upload_prices, get_full_prices_past, create_df_extra_assets_data, upload_indicators
 import sys
 import os
 
 # Add 'utils' directory to the Python path
 sys.path.append('/opt/airflow/dags/utils/')
 
-from utils import api_request_get_asset_from_asset_id, get_last_timestamp, get_data_from_api, upload_prices, get_full_prices_past, create_df_extra_assets_data, upload_indicators
-
-from datetime import datetime , timedelta
-import pandas as pd
-
-from airflow import DAG
-from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
-from airflow.operators.dummy import DummyOperator
-
-
 
 EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-BTCUSDT_MINUTE_ID = "bbf9f332-a499-4473-8095-9c17923556f6"
+ADAUSDT_DAY_ID = "c9313f95-9565-49a8-b96b-d96989f83820"
 
 
 def main():
 
     base_url = "http://172.24.100.128:5000/"
 
-    ASSET_ID = BTCUSDT_MINUTE_ID
+    ASSET_ID = ADAUSDT_DAY_ID
 
     print("asset: "+ASSET_ID)
 
@@ -72,12 +68,12 @@ default_args = {
 
 
 with DAG(
-        dag_id="BTCUSDT_historic_minute",
+        dag_id="ADAUSDT_historic_day",
         default_args=default_args,
-        description="Upload information of BTCUSDT historic with day interval",
-        schedule_interval="0 */2 * * *",
-        catchup=False,
-        tags=['BTCUSDT', 'minute']
+    description="Upload information of ADAUSDT historic with day interval",
+    schedule_interval="0 7 * * *",
+    catchup=False,
+        tags=['ADAUSDT', 'day']
 
 ) as dag:
 
