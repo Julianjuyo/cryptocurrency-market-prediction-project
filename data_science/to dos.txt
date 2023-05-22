@@ -1,0 +1,35 @@
+- graficar predicciones (Test) 
+    - Convertido a valor ($)
+    - Fechas
+    
+- Iterar
+    - 3 Monedas ( BTC, ETH, ADA)
+    - 2 Datasets (horas - minutos)
+    - Horizonte de prediccion (m h)
+        - 1 h
+        - 3 h
+        - 6 h  
+        - 12 h
+        - 1 d 
+        - 3 d
+        - 7 d
+        
+    - Clasificacion
+        
+
+- Documentacion de modelos
+
+    
+- Metricas
+    - MSE *
+    - MAE *
+    - MeanSquaredLogarithmicError 
+    
+ https://keras.io/api/losses/regression_losses/
+ 
+ - Definir
+     - Mejor proceso de escalamiento
+     - ML FLOW
+  
+
+- XGBoost
