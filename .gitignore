@@ -237,3 +237,7 @@ airflow/venv
 
 
 airflow/logs
+
+
+data_science/data/.csv
+
