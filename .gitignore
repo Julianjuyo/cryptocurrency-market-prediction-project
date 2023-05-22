@@ -233,5 +233,8 @@ data-loader/commodities
 
 airflow/venv
 
+data-loader/env-fastapi
+
+
 
 airflow/logs
