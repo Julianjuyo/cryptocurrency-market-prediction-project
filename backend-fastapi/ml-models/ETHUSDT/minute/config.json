@@ -1,0 +1,44 @@
+{
+    "ETHUSDT_minute_1h_ahead.h5":{
+        "delay":60,
+        "sampling_rate":5,
+        "sequence_length":288,
+        "batch_size": 64
+    },
+    "ETHUSDT_minute_3h_ahead.h5":{
+        "delay":180,
+        "sampling_rate":10,
+        "sequence_length":432,
+        "batch_size": 64
+    },
+    "ETHUSDT_minute_6h_ahead.h5":{
+        "delay":360,
+        "sampling_rate":20,
+        "sequence_length":432,
+        "batch_size": 64
+    },
+    "ETHUSDT_minute_12h_ahead.h5":{
+        "delay":720,
+        "sampling_rate":20,
+        "sequence_length":432,
+        "batch_size": 64
+    },
+    "ETHUSDT_minute_24h_ahead.h5":{
+        "delay":1440,
+        "sampling_rate":30,
+        "sequence_length":432,
+        "batch_size": 64
+    },
+    "ETHUSDT_minute_3d_ahead.h5":{
+        "delay":4320,
+        "sampling_rate":30,
+        "sequence_length":432,
+        "batch_size": 64
+    },
+    "ETHUSDT_minute_7d_ahead.h5":{
+        "delay":10080,
+        "sampling_rate":45,
+        "sequence_length":300,
+        "batch_size": 64
+    }
+}

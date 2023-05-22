@@ -103,23 +103,21 @@ def candlestick_chart(df, interval, title_name):
     return column(candlestick), column(volume)
 
 
-
 # Buscar la lista de exchanges que se quieren seleccionar
 filelist = [" "]
-
 
 # Dict with future values
 future_times ={
     "ADAUSDT":{
-        "minute": [1, 5, 10, 15, 30],
+        "minute": ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
         "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"]
     },
     "ETHUSDT":{
-        "minute": [1, 5, 10, 15, 30],
+        "minute": ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
         "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"]
     },
     "BTCUSDT":{
-        "minute": [1, 5, 10, 15, 30],
+        "minute": ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
         "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"]
     } 
 }

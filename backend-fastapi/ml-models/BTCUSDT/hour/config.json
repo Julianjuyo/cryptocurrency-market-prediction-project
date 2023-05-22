@@ -1,41 +1,41 @@
 {
-    "ETHUSDT_hour_1h_ahead.h5":{
+    "BTCUSDT_hour_1h_ahead.h5":{
         "delay":1,
         "sampling_rate":2,
         "sequence_length":96,
         "batch_size": 32
     },
-    "ETHUSDT_hour_3h_ahead.h5":{
+    "BTCUSDT_hour_3h_ahead.h5":{
         "delay":3,
         "sampling_rate":2,
         "sequence_length":96,
         "batch_size": 32
     },
-    "ETHUSDT_hour_6h_ahead.h5":{
+    "BTCUSDT_hour_6h_ahead.h5":{
         "delay":6,
         "sampling_rate":2,
         "sequence_length":96,
         "batch_size": 32
     },
-    "ETHUSDT_hour_12h_ahead.h5":{
+    "BTCUSDT_hour_12h_ahead.h5":{
         "delay":12,
         "sampling_rate":3,
         "sequence_length":96,
         "batch_size": 32
     },
-    "ETHUSDT_hour_24h_ahead.h5":{
+    "BTCUSDT_hour_24h_ahead.h5":{
         "delay":24,
-        "sampling_rate":3,
+        "sampling_rate":2,
         "sequence_length":96,
         "batch_size": 32
     },
-    "ETHUSDT_hour_3d_ahead.h5":{
+    "BTCUSDT_hour_3d_ahead.h5":{
         "delay":72,
         "sampling_rate":4,
         "sequence_length":120,
         "batch_size": 32
     },
-    "ETHUSDT_hour_7d_ahead.h5":{
+    "BTCUSDT_hour_7d_ahead.h5":{
         "delay":168,
         "sampling_rate":6,
         "sequence_length":120,
