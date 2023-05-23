@@ -14,12 +14,12 @@ import numpy as np
 import pandas as pd
 import math
 
-# import tensorflow as tf
-# from tensorflow import keras
-# from tensorflow.keras.utils import Sequence
-# from sklearn.preprocessing import MinMaxScaler
-# from sklearn.metrics import mean_squared_error
-# from tensorflow.keras.models import load_model
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.utils import Sequence
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error
+from tensorflow.keras.models import load_model
 
 
 
@@ -90,81 +90,120 @@ def round_day(epoch_timestamp):
     return int(rounded_timestamp3.timestamp())
 
 
-# def data_preparation(df):
+def data_preparation(df):
 
-#     # drop the datetime column
-#     df_reduced = df.drop(columns=['datetime'])
+    # drop the datetime column
+    df_reduced = df.drop(columns=['date_time_gmt_5','id',"updated_at","unix_time","date_time_utc","asset_id","created_at"])
 
-#     scaler = MinMaxScaler()
+    # Specify the columns to change the order
+    columns_to_reorder = ['open_price', 'high_price','low_price','close_price','volume','close_time','qav','num_trades','taker_base_vol','taker_quote_vol','ignore']
 
-#     # Fit the scaler on your dataframe (let's say it's called df)
-#     df_normalized = scaler.fit_transform(df_reduced)
+    # Get the remaining columns in their original order
+    remaining_columns = [col for col in df_reduced.columns if col not in columns_to_reorder]
 
-#     # Convert the normalized data back to a dataframe
-#     df_normalized = pd.DataFrame(df_normalized, columns=df_reduced.columns)
+    # # Reorder the columns
+    df_reduced = df_reduced[columns_to_reorder + remaining_columns]
 
-#     # Convert the DataFrame to a NumPy array
-#     raw_data = df_normalized.values
-#     close = df_normalized['close_price'].values
-#     close = close.reshape((len(close),1))
+    # fill null values with the mean
+    df_reduced = df_reduced.fillna(df_reduced.mean())
 
-#     # Display the NumPy array
-#     print(type(raw_data))
-#     print(raw_data.shape)
-#     print(close.shape)
+    scaler = MinMaxScaler()
 
-#     return raw_data, close
+    # Fit the scaler on your dataframe (let's say it's called df)
+    df_normalized = scaler.fit_transform(df_reduced)
+
+    # Convert the normalized data back to a dataframe
+    df_normalized = pd.DataFrame(df_normalized, columns=df_reduced.columns)
+
+    # Convert the DataFrame to a NumPy array
+    raw_data = df_normalized.values
+    close = df_normalized['close_price'].values
+    close = close.reshape((len(close),1))
+
+    # Display the NumPy array
+    print(type(raw_data))
+    print(raw_data.shape)
+    print(close.shape)
+
+    return raw_data, close , df_reduced
 
 
 
-# def predict(df,model_path,delay,sampling_rate,sequence_length):
+def predict(df,model_path,delay,sampling_rate,sequence_length, batch_size):
 
-#     raw_data, close = data_preparation(df)
+        
+    raw_data, close , df_reduced = data_preparation(df)
 
-#     # Set Parameters
+    print("INFINITOS")
+    # df2 = df[np.isfinite(df).all(1)]
+    # print(df2)
+    # print(df[np.isfinite(df).all(1)])
 
-#     # sequence_stride: period between sequences
-#     # First sequence starts at t0
-#     # Second sequence will start at t1 with sequence_stride=1 or at t5 with sequence_stride=5
-#     sequence_stride = 1
+    # print(raw_data)
+    # print(close)
+    # Set Parameters
 
-#     #batch_size: Number of timeseries samples in each batch (except maybe the last one). 
-#     #If None, the data will not be batched (the dataset will yield individual samples).
-#     # Huge impact in performance.
-#     # Tip, should be multiple of 8
-#     batch_size = 32
+    # sequence_stride: period between sequences
+    # First sequence starts at t0
+    # Second sequence will start at t1 with sequence_stride=1 or at t5 with sequence_stride=5
+    sequence_stride = 1
 
-#     # Understanding our parameters
-#     msg = f"The timeseries will consist of batches containing {batch_size} sequences of {sequence_length} samples."
+    #batch_size: Number of timeseries samples in each batch (except maybe the last one). 
+    #If None, the data will not be batched (the dataset will yield individual samples).
+    # Huge impact in performance.
+    # Tip, should be multiple of 8
 
-#     msg += f"\nFinally our target is {delay} timesteps in the future, and will have data from {sequence_length * sampling_rate} timesteps in the past"
-#     print(msg)
+    # Understanding our parameters
+    msg = f"The timeseries will consist of batches containing {batch_size} sequences of {sequence_length} samples."
 
-#     keras_dataset = keras.preprocessing.timeseries_dataset_from_array(
-#                         raw_data[:-delay],
-#                         targets=close[delay:],
-#                         sampling_rate=sampling_rate,
-#                         sequence_stride=sequence_stride,
-#                         sequence_length=sequence_length,
-#                         shuffle=False, # Shouldn't the shuffle be set to 0?
-#                         seed=33,
-#                         batch_size=batch_size,
-#                         start_index=0)
+    msg += f"\nFinally our target is {delay} timesteps in the future, and will have data from {sequence_length * sampling_rate} timesteps in the past"
+    print(msg)
+
+    keras_dataset = keras.preprocessing.timeseries_dataset_from_array(
+                        raw_data[:-delay],
+                        targets=close[delay:],
+                        sampling_rate=sampling_rate,
+                        sequence_stride=sequence_stride,
+                        sequence_length=sequence_length,
+                        shuffle=False, # Shouldn't the shuffle be set to 0?
+                        seed=33,
+                        batch_size=batch_size,
+                        start_index=0)
     
-#     # Load the model from the .h5 file
-#     modelo =  load_model(model_path)
+    print("paso keras: "+str(len(keras_dataset)))
+    print(keras_dataset)
 
-#     test_pred = modelo.predict(keras_dataset)
 
-#     # Assume 'y_normalized' contains the predicted values for the 'target' column in normalized form
-#     y_min = df['close_price'].min()
-#     y_max = df['close_price'].max()
 
-#     test_pred = test_pred * (y_max - y_min) + y_min
+    # Load the model from the .h5 file
+    modelo = load_model(model_path)
 
-#     predicted_prices = pd.DataFrame(test_pred, columns=['close_price'])
 
-#     return predicted_prices
+
+    test_pred = modelo.predict(keras_dataset)
+
+
+    print("Predicciones realizadas")
+
+    print(test_pred)
+    print(len(test_pred))
+
+
+
+    # Assume 'y_normalized' contains the predicted values for the 'target' column in normalized form
+    y_min = df_reduced['close_price'].min()
+    y_max = df_reduced['close_price'].max()
+
+    test_pred = test_pred * (y_max - y_min) + y_min
+    print("predicciones")
+    print(test_pred)
+
+
+    predicted_prices = pd.DataFrame(test_pred, columns=['close_price'])
+
+    print(predicted_prices.head())
+
+    return predicted_prices
 
 
 # Function to add incremental number starting from a specific value
@@ -174,9 +213,6 @@ def add_incremental_number(row, increment, starting_number):
 
 def merge_dataframes(predicted_prices, df_initial,increment):
 
-    print(df_initial.columns)
-
-    print(df_initial['unix_time'].max())
 
     starting_number = df_initial['unix_time'].max()+increment
 
@@ -186,7 +222,6 @@ def merge_dataframes(predicted_prices, df_initial,increment):
 
     # insert the last close price as the open price of the first row
     predicted_prices['open_price'] = predicted_prices['close_price'].shift(1)
-
 
     # Find the index of the row with the specified unix_time
     index = predicted_prices.loc[predicted_prices['unix_time'] == starting_number].index[0]
@@ -205,10 +240,13 @@ def merge_dataframes(predicted_prices, df_initial,increment):
     # Create the new 'high_price' column with the specified conditions
     predicted_prices['high_price'] = predicted_prices.apply(lambda row: row['open_price'] if row['close_price'] < row['open_price']
                                 else row['close_price'], axis=1)
-
+    
+    predicted_prices['low_price'] = predicted_prices['low_price'] - (0.001 * predicted_prices['low_price'])
+    predicted_prices['high_price'] = predicted_prices['high_price'] + (0.001 * predicted_prices['high_price'])
 
     result_df = pd.concat([df_initial, predicted_prices], axis=0)
     result_df.sort_values('unix_time', ascending=True, inplace=True)
+
 
     return result_df
 
@@ -225,7 +263,7 @@ def add_indicators(df):
     df['pvo'] = ta.momentum.pvo(volume=df['volume'])
     df['roc'] = ta.momentum.roc(close=df['close_price'])
     df['rsi'] = ta.momentum.rsi(close=df['close_price'])
-    df['stochrsi'] = ta.momentum.stochrsi(close=df['close_price'])
+    # df['stochrsi'] = ta.momentum.stochrsi(close=df['close_price'])
     df['stoch'] = ta.momentum.stoch(
         close=df['close_price'], high=df['high_price'], low=df['low_price'])
     df['tsi'] = ta.momentum.tsi(close=df['close_price'])
@@ -334,6 +372,7 @@ def add_indicators(df):
     df['sma'] = ta.trend.sma_indicator(close=df['close_price'])
     df['wma'] = ta.trend.wma_indicator(close=df['close_price'])
     df['stc'] = ta.trend.stc(close=df['close_price'])
+
     # df['trix'] = ta.trend.trix(close=df['close_price'])
 
     df['vi_pos'] = ta.trend.vortex_indicator_pos(

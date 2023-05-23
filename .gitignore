@@ -233,10 +233,11 @@ data-loader/aux_folder
 
 data-loader/commodities
 
+
 airflow/venv
 
 data-loader/env-fastapi
-
+data-loader/myenv
 
 
 airflow/logs

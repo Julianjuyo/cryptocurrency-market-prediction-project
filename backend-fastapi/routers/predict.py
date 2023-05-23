@@ -39,6 +39,8 @@ def predict_(asset_id: str = Path(min_length=36, max_length=36), future_time: st
 
     serach_historic_data = PredictService(db.session).get_indicators_and_merge(asset_id, unix_time_end,future_time)
 
+    print(serach_historic_data)
+
     try:
         # Convert dataframe to a list of SimplifiedPrice objects
         object_list = []

@@ -3,7 +3,7 @@ from models.asset import Asset as AssetModel
 from models.indicator import Indicator as IndicatorModel
 
 
-from services.utils import convert_unix_time, add_indicators, find_file_and_config_json, round_day, round_minute, round_hour,merge_dataframes
+from services.utils import * # add_indicators, find_file_and_config_json, round_day, round_minute, round_hour,merge_dataframes,predict
 from services.price import PriceService
 
 
@@ -52,6 +52,7 @@ class PredictService():
         delay = config_json["delay"]
         sampling_rate = config_json["sampling_rate"]
         sequence_length = config_json["sequence_length"]
+        batch_size = config_json["batch_size"]
         number_data_past= (sequence_length * sampling_rate) + delay
 
         if interval == "minute":
@@ -83,20 +84,29 @@ class PredictService():
 
         df = pd.json_normalize(prices_json)
 
+        df['close_time'] = df['unix_time'] + (increment - 1)
+
+        print(len(df))
+
+        
+
         df_prices_wit_indicators_all = add_indicators(df)
 
         df_prices_wit_indicators = df_prices_wit_indicators_all.loc[df_prices_wit_indicators_all['unix_time'] >= unix_time_start]
 
-        # Predicted prices
-        predicted_prices = pd.DataFrame({'close_price': [3232, 2332, 2772]})
+
+
+        # Sort the dataframe by 'unix_time' column in ascending order
+        df_sorted = df_prices_wit_indicators.sort_values('unix_time', ascending=True)
+
+
+        predicted_prices = predict(df_sorted, file_path,delay,sampling_rate,sequence_length, batch_size)
 
 
         # Select only data necesary
         df_initial = df_prices_wit_indicators[["unix_time", "open_price", "close_price", "low_price", "high_price", "volume"]].copy()
 
-        last_timestamp = df_initial['unix_time'].max()
-
-        df_initial = df_initial.loc[df_initial['unix_time'] >= (df_initial['unix_time'].max()-(increment*10))]
+        df_initial = df_initial.loc[df_initial['unix_time'] >= (df_initial['unix_time'].max()-(increment*30))]
 
         return merge_dataframes(predicted_prices,df_initial,increment)
 
