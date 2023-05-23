@@ -17,8 +17,6 @@ from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, DatetimeTickFormatter
 
 
-
-
 ON_DOCKER = os.environ.get('ON_DOCKER', False)
 
 st.set_page_config(layout='wide')
@@ -31,6 +29,8 @@ st.set_page_config(layout='wide')
 
 * Juan Diego Sanchez
 * Julian Oliveros Forero
+
+### The objective of this project is to enhance comprehension of market predictability by employing machine learning techniques. This endeavor aims to assist cryptocurrency investors and stakeholders in making informed decisions by predicting market prices and trends, focusing specifically on Bitcoin, Ethereum, and Cardano. Machine learning models will be trained using historical market data to achieve this goal.
 
 """
 
@@ -50,12 +50,20 @@ def candlestick_chart(df, interval, title_name):
 
     st.write(df)
 
+    st.write("The line_color blue is the future data")
+
     # Set the index of the dataframe to the 'date' column
     df = df.set_index('datetime')
 
     # Define variables for increasing and decreasing prices
-    inc = df.close_price > df.open_price
-    dec = df.open_price > df.close_price
+    
+
+    inc_new = (df.close_price > df.open_price) & (df.volume <= 0)
+    dec_new = (df.open_price > df.close_price) & (df.volume <= 0)
+
+    inc = (df.close_price > df.open_price) & (df.volume > 0)
+    dec = (df.open_price > df.close_price) & (df.volume > 0)
+
 
     # Set the width of the bars based on the interval
     if interval == "minute":
@@ -73,13 +81,24 @@ def candlestick_chart(df, interval, title_name):
     # Plot the high and low prices as line segments
     candlestick.segment(df.index, df.high_price, df.index, df.low_price, color="black")
 
-    # Plot the increasing prices as red bars and the decreasing prices as green bars
+    
+
+    # # Plot the increasing prices as red bars and the decreasing prices as green bars
+    candlestick.vbar(df.index[inc_new], w, df.open_price[inc_new], df.close_price[inc_new],
+            fill_color="red", line_color="blue")
+
+    candlestick.vbar(df.index[dec_new], w, df.open_price[dec_new], df.close_price[dec_new],
+            fill_color="green", line_color="blue")
+    
     candlestick.vbar(df.index[inc], w, df.open_price[inc], df.close_price[inc],
             fill_color="red", line_color="red")
 
     candlestick.vbar(df.index[dec], w, df.open_price[dec], df.close_price[dec],
             fill_color="green", line_color="green")
     
+   
+    
+
     ## Volume Chart
     # Create a figure for the volume chart with a datetime x-axis
     volume = figure(x_axis_type="datetime")
@@ -163,31 +182,6 @@ def api_request_predicts_from_asset_id(base_url, asset_id,future_time):
         st.error("Error while make the http Request")
     return df
 
-# Method to make API request to retrieve prices for a given asset ID between two specified Unix timestamps
-def api_request_get_prices_between_unix_time(base_url, asset_id, unix_time_start, unix_time_end):
-    try:
-        # Make GET request to API endpoint with query parameters for start and end Unix timestamps
-        response = requests.get(base_url + "assets/" + asset_id + "/indicators_unix_between/", params={'unix_time_start': unix_time_start, 'unix_time_end': unix_time_end})
-
-        # Check if the request was successful
-        if response.status_code == requests.codes.ok:
-            print(response.status_code)
-            # Convert JSON response to Python dictionary
-            json_data = json.loads(response.content)
-
-            # Normalize the dictionary and convert it to a Pandas DataFrame
-            df = pd.json_normalize(json_data)
-
-            # Return the DataFrame containing the retrieved price data
-            return df
-        else:
-            print(response.content)
-        
-    except:
-        print("Failed api_request_get_prices_between_unix_time")
-
-
-
 # Get the unix times for the selected interval
 def get_unix_times(interval):
 
@@ -209,7 +203,6 @@ def get_unix_times(interval):
 def convert_unix_time(unix_time):
     utc_datetime = datetime.utcfromtimestamp(unix_time)
     return utc_datetime
-
 
 
 # Get all the Exchanges
@@ -293,18 +286,16 @@ if len(exchange) > 1:
             # #bring the past prices  to show the graph
             # prices = api_request_get_prices_between_unix_time(base_url,selected_asset,get_unix_times(asset_interval)[0], get_unix_times(asset_interval)[1])
 
-            try:
-                resp['datetime'] = resp['unix_time'].apply(convert_unix_time)
-
-
-                # Show the graph of the prediction
-                chart = candlestick_chart(resp, asset_interval,asset_symbol)
     
-                st.bokeh_chart(chart[0],use_container_width=True)     
-                st.bokeh_chart(chart[1],use_container_width=True)   
+            resp['datetime'] = resp['unix_time'].apply(convert_unix_time)
 
-            except:
-                st.error("Error while showing the graph")  
+            # Show the graph of the prediction
+            chart = candlestick_chart(resp, asset_interval,asset_symbol)
+
+            st.bokeh_chart(chart[0],use_container_width=True)     
+            st.bokeh_chart(chart[1],use_container_width=True)   
+
+           
 
 
         if submit_selected_file and future_time == None:

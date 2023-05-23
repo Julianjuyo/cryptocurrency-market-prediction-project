@@ -86,9 +86,6 @@ class PredictService():
 
         df['close_time'] = df['unix_time'] + (increment - 1)
 
-        print(len(df))
-
-        
 
         df_prices_wit_indicators_all = add_indicators(df)
 
@@ -106,7 +103,7 @@ class PredictService():
         # Select only data necesary
         df_initial = df_prices_wit_indicators[["unix_time", "open_price", "close_price", "low_price", "high_price", "volume"]].copy()
 
-        df_initial = df_initial.loc[df_initial['unix_time'] >= (df_initial['unix_time'].max()-(increment*30))]
+        df_initial = df_initial.loc[df_initial['unix_time'] >= (df_initial['unix_time'].max()-(increment*50))]
 
         return merge_dataframes(predicted_prices,df_initial,increment)
 
