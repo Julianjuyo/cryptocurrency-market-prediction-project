@@ -78,7 +78,7 @@ class PredictService():
             PriceModel.unix_time >= first_indicator_time, PriceModel.unix_time <= unix_time_end_round, PriceModel.asset_id == asset_id)).all()
 
         if not prices:
-            return {'error message': 'The Prices with the given unix_time time range was not found'}
+            return {'error message': 'The are no Prices with the given unix_time range'}
         
         prices_json = jsonable_encoder(prices)
 

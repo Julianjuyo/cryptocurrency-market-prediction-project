@@ -129,15 +129,23 @@ filelist = [" "]
 future_times ={
     "ADAUSDT":{
         "minute": ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
-        "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"]
+        "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
+        "day"   : None
     },
     "ETHUSDT":{
         "minute": ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
-        "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"]
+        "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
+        "day"   : None
     },
     "BTCUSDT":{
         "minute": ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
-        "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"]
+        "hour"  : ["1h", "3h", "6h", "12h", "24h","3d", "7d"],
+        "day"   : None
+    } ,
+    "BNBUSDT":{
+        "minute": None,
+        "hour"  : None,
+        "day"   : None
     } 
 }
 
@@ -174,13 +182,17 @@ def api_request_get_all_assets_from_exchange_id(base_url, exchange_id):
 # to get the prediction for a specific asset
 def api_request_predicts_from_asset_id(base_url, asset_id,future_time):
 
-    try:
-        response = requests.get(base_url+"predicts/"+asset_id+"/future_time/"+future_time)
+    response = requests.get(base_url+"predicts/"+asset_id+"/future_time/"+future_time)
+
+
+    if response.status_code == requests.codes.ok:
         json_data = json.loads(response.content)
         df = pd.json_normalize(json_data)
-    except:
-        st.error("Error while make the http Request")
-    return df
+        return False, df
+    else:
+        json_data = json.loads(response.content)
+        return True , json_data
+    
 
 # Get the unix times for the selected interval
 def get_unix_times(interval):
@@ -257,43 +269,58 @@ if len(exchange) > 1:
     if len(selected_asset) > 1:
 
         future_time = None
-        # Get the number of minutes in the future it wants to predict
-        future_time = st.selectbox(
-            "Indicate the number of "+ asset_interval+" you want to predict in the future",future_times[asset_symbol][asset_interval])
 
-        submit_selected_file = st.button("Predict")
+        submit_selected_file = None
 
-        if submit_selected_file and future_time != None:
+  
+        
 
-            st.write("Asset to predict: ", asset_symbol,
-                     " with an interval of ", asset_interval)
+        if future_times[asset_symbol][asset_interval] == None:
+            st.error("Theres no models for this asset and interval")
 
-            # request to the backend to get the prediction
-            with st.spinner('Please wait while the algorithm is predicting...'):
+        else:
+                
+            # Get the number of minutes in the future it wants to predict
+            future_time = st.selectbox(
+                "Indicate the number of "+ asset_interval+" you want to predict in the future",future_times[asset_symbol][asset_interval])
 
-                time.sleep(1)
+            submit_selected_file = st.button("Predict")
 
-                resp = api_request_predicts_from_asset_id(
-                    base_url, selected_asset, future_time)
+            if submit_selected_file and future_time != None:
+
+                st.write("Asset to predict: ", asset_symbol,
+                        " with an interval of ", asset_interval)
+
+                # request to the backend to get the prediction
+                with st.spinner('Please wait while the algorithm is predicting...'):
+
+                    time.sleep(1)
+
+                fallo, resp = api_request_predicts_from_asset_id(
+                        base_url, selected_asset, future_time)
+                
+                if fallo == True:
+                    st.error(resp["error message"])
+
+                else:
+                    
+                    # Show the output of the prediccion
+                    st.success("The value is of the price is: " +
+                            str( resp.loc[(resp['unix_time'] == resp['unix_time'].max()), "close_price"].iloc[0]))
+                    
 
 
-            # Show the output of the prediccion
-            st.success("The value is of the price is: " +
-                       str( resp.loc[(resp['unix_time'] == resp['unix_time'].max()), "close_price"].iloc[0]))
+                    # #bring the past prices  to show the graph
+                    # prices = api_request_get_prices_between_unix_time(base_url,selected_asset,get_unix_times(asset_interval)[0], get_unix_times(asset_interval)[1])
+
             
+                    resp['datetime'] = resp['unix_time'].apply(convert_unix_time)
 
+                    # Show the graph of the prediction
+                    chart = candlestick_chart(resp, asset_interval,asset_symbol)
 
-            # #bring the past prices  to show the graph
-            # prices = api_request_get_prices_between_unix_time(base_url,selected_asset,get_unix_times(asset_interval)[0], get_unix_times(asset_interval)[1])
-
-    
-            resp['datetime'] = resp['unix_time'].apply(convert_unix_time)
-
-            # Show the graph of the prediction
-            chart = candlestick_chart(resp, asset_interval,asset_symbol)
-
-            st.bokeh_chart(chart[0],use_container_width=True)     
-            st.bokeh_chart(chart[1],use_container_width=True)   
+                    st.bokeh_chart(chart[0],use_container_width=True)     
+                    st.bokeh_chart(chart[1],use_container_width=True)   
 
            
 
