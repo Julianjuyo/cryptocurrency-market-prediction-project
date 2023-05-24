@@ -171,14 +171,13 @@ def predict(df,model_path,delay,sampling_rate,sequence_length, batch_size):
                         start_index=0)
     
     print("paso keras: "+str(len(keras_dataset)))
-    print(keras_dataset)
+    print("model path: "+str(model_path))
+
 
 
 
     # Load the model from the .h5 file
     modelo = load_model(model_path)
-
-
 
     test_pred = modelo.predict(keras_dataset)
 
@@ -247,6 +246,8 @@ def merge_dataframes(predicted_prices, df_initial,increment):
     result_df = pd.concat([df_initial, predicted_prices], axis=0)
     result_df.sort_values('unix_time', ascending=True, inplace=True)
 
+    max_row_index = result_df['unix_time'].idxmax()
+    result_df = result_df.drop(max_row_index)
 
     return result_df
 

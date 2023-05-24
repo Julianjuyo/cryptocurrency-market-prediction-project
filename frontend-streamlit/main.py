@@ -5,6 +5,8 @@ import os
 import time
 import json
 from datetime import datetime, timedelta
+import pytz
+
 
 
 # Bokeh imports for the candlestick chart
@@ -43,7 +45,7 @@ else:
 
 
 # Create a candlestick chart for the selected exchange and asset
-def candlestick_chart(df, interval, title_name):
+def candlestick_chart(df, interval, title_name, timezone):
 
 
     df["datetime"] = pd.to_datetime(df["datetime"])
@@ -75,7 +77,7 @@ def candlestick_chart(df, interval, title_name):
 
     ## Candlestick chart
     # Create a figure for the candlestick chart with a datetime x-axis and a title
-    candlestick = figure(x_axis_type="datetime", title = str(title_name+" in "+interval+ " Interval"))
+    candlestick = figure(x_axis_type="datetime", title = str(title_name+" in "+interval+ " Interval" + " in "+timezone))
 
 
     # Plot the high and low prices as line segments
@@ -180,9 +182,9 @@ def api_request_get_all_assets_from_exchange_id(base_url, exchange_id):
 
 
 # to get the prediction for a specific asset
-def api_request_predicts_from_asset_id(base_url, asset_id,future_time):
+def api_request_predicts_from_asset_id(base_url, asset_id,future_time,utc_timestamp):
 
-    response = requests.get(base_url+"predicts/"+asset_id+"/future_time/"+future_time)
+    response = requests.get(base_url+"predicts/"+asset_id+"/future_time/"+future_time,params={"unix_time_end":utc_timestamp})
 
 
     if response.status_code == requests.codes.ok:
@@ -191,6 +193,7 @@ def api_request_predicts_from_asset_id(base_url, asset_id,future_time):
         return False, df
     else:
         json_data = json.loads(response.content)
+        print(json_data)
         return True , json_data
     
 
@@ -212,9 +215,13 @@ def get_unix_times(interval):
 
 
 # Convert unix time to datetime
-def convert_unix_time(unix_time):
+def convert_unix_time(unix_time,target_timezone):
     utc_datetime = datetime.utcfromtimestamp(unix_time)
-    return utc_datetime
+    converted_datetime = utc_datetime.astimezone(target_timezone)
+    return converted_datetime
+
+
+
 
 
 # Get all the Exchanges
@@ -272,13 +279,41 @@ if len(exchange) > 1:
 
         submit_selected_file = None
 
-  
-        
-
         if future_times[asset_symbol][asset_interval] == None:
             st.error("Theres no models for this asset and interval")
 
         else:
+
+            st.write("Select since wich time you want to predict")
+
+            # Get a list of available timezones
+            timezones = pytz.all_timezones
+
+            # Timezone picker
+            default_timezone = "UTC"
+            selected_timezone = st.selectbox("Select a timezone", timezones, index=timezones.index(default_timezone))
+
+            # Selected date picker
+            selected_date = st.date_input("Select a date")
+
+            # Selected time picker
+            selected_time = st.time_input("Select a time")
+
+            # Combine the selected date and time
+            selected_datetime = datetime.combine(selected_date, selected_time)
+
+            # Specify the target timezone
+            target_timezone = pytz.timezone(selected_timezone)
+
+            # Localize the selected datetime to the selected timezone
+            local_datetime = pytz.timezone(selected_timezone).localize(selected_datetime)
+
+            # Convert the localized datetime to UTC
+            utc_datetime = local_datetime.astimezone(pytz.UTC)
+
+            # Convert UTC datetime to timestamp
+            utc_timestamp = int(utc_datetime.timestamp())
+
                 
             # Get the number of minutes in the future it wants to predict
             future_time = st.selectbox(
@@ -297,10 +332,19 @@ if len(exchange) > 1:
                     time.sleep(1)
 
                 fallo, resp = api_request_predicts_from_asset_id(
-                        base_url, selected_asset, future_time)
+                        base_url, selected_asset, future_time,utc_timestamp)
                 
                 if fallo == True:
-                    st.error(resp["error message"])
+
+                    print(resp)
+                    st.error(resp['error message'])
+
+                    if resp["error message"] == "The selected datetime is bigger than the last price datetime in the database":
+
+
+                        converted_datetime = convert_unix_time(int(resp['timestamp']),target_timezone)
+
+                        st.error("las time stamp in the database in selected timezone: "+ str(converted_datetime))
 
                 else:
                     
@@ -309,21 +353,15 @@ if len(exchange) > 1:
                             str( resp.loc[(resp['unix_time'] == resp['unix_time'].max()), "close_price"].iloc[0]))
                     
 
-
-                    # #bring the past prices  to show the graph
-                    # prices = api_request_get_prices_between_unix_time(base_url,selected_asset,get_unix_times(asset_interval)[0], get_unix_times(asset_interval)[1])
-
-            
-                    resp['datetime'] = resp['unix_time'].apply(convert_unix_time)
+                    resp['datetime'] = resp['unix_time'].apply(lambda x: convert_unix_time(x, target_timezone))
 
                     # Show the graph of the prediction
-                    chart = candlestick_chart(resp, asset_interval,asset_symbol)
+                    chart = candlestick_chart(resp, asset_interval,asset_symbol,str(target_timezone))
 
                     st.bokeh_chart(chart[0],use_container_width=True)     
                     st.bokeh_chart(chart[1],use_container_width=True)   
 
            
-
 
         if submit_selected_file and future_time == None:
 

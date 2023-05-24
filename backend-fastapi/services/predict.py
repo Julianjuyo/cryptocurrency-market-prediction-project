@@ -33,6 +33,16 @@ class PredictService():
 
     def get_indicators_and_merge(self, asset_id, unix_time_end, future_time ):
 
+
+        unix_time_end = int(unix_time_end)
+
+        unix_time_now = int(datetime.now().timestamp())
+
+
+        if unix_time_end >= unix_time_now:
+            print("ETRNOU")
+            return {'error message': 'The datetime since you want to predict has to be in the past'}
+
         asset = self.db.query(AssetModel).filter(
             AssetModel.id == asset_id).first()
 
@@ -53,26 +63,42 @@ class PredictService():
         sampling_rate = config_json["sampling_rate"]
         sequence_length = config_json["sequence_length"]
         batch_size = config_json["batch_size"]
-        number_data_past= (sequence_length * sampling_rate) + delay
+        # se debe sumar el delay dos veces para tener el tiempo adecuado
+        number_data_past= (sequence_length * sampling_rate) + (delay*2)
 
         if interval == "minute":
             unix_time_end_round = round_minute(unix_time_end)
-            unix_time_start = unix_time_end_round - ((number_data_past+delay) * 60)
+            unix_time_start = unix_time_end_round - ((number_data_past) * 60)
             first_indicator_time = unix_time_start - 6000
             increment = 60
 
         if interval == "hour":
             unix_time_end_round = round_hour(unix_time_end)
-            unix_time_start = unix_time_end_round - ((number_data_past+delay) * 3600)
+            unix_time_start = unix_time_end_round - ((number_data_past) * 3600)
             first_indicator_time = unix_time_start - 360000
             increment = 3600
 
         if interval == "day":
 
             unix_time_end_round = round_day(unix_time_end)
-            unix_time_start = unix_time_end_round - ((number_data_past+delay) * 86400)
+            unix_time_start = unix_time_end_round - ((number_data_past) * 86400)
             first_indicator_time = unix_time_start - 8640000
             increment = 86400
+
+
+        last_price = self.db.query(PriceModel).filter(PriceModel.asset_id == asset_id).order_by(desc(PriceModel.unix_time)).first()
+
+        if not last_price:
+            return {'error message': "There are not prices for this asset"}
+        
+        last_price_json = jsonable_encoder(last_price)
+
+        last_unix_time = last_price_json["unix_time"]
+
+        if unix_time_end_round > last_unix_time:
+            return {'error message': "The selected datetime is bigger than the last price datetime in the database",
+                    'timestamp': last_unix_time }
+        
 
         prices = self.db.query(PriceModel).filter(and_(
             PriceModel.unix_time >= first_indicator_time, PriceModel.unix_time <= unix_time_end_round, PriceModel.asset_id == asset_id)).all()
@@ -86,10 +112,19 @@ class PredictService():
 
         df['close_time'] = df['unix_time'] + (increment - 1)
 
-
         df_prices_wit_indicators_all = add_indicators(df)
 
-        df_prices_wit_indicators = df_prices_wit_indicators_all.loc[df_prices_wit_indicators_all['unix_time'] >= unix_time_start]
+        df_prices_wit_indicators = df_prices_wit_indicators_all.loc[df_prices_wit_indicators_all['unix_time'] > unix_time_start]
+
+
+        print("numero data: "+str(number_data_past))
+        print("numero dataframe final: "+ str(len(df_prices_wit_indicators)))
+        print("unix_time_end: "+str(unix_time_end))
+        print("unix_time_start: "+ str(unix_time_start))
+        print("unix_time_end_round: "+ str(unix_time_end_round))
+        print("first_indicator_time: "+ str(first_indicator_time))
+              
+        
 
 
 

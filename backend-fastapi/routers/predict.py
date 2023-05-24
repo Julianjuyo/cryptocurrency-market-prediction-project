@@ -33,13 +33,9 @@ predict_router = APIRouter()
 
     status_code=status.HTTP_200_OK,
     summary="Predict future price for a given asset")
-def predict_(asset_id: str = Path(min_length=36, max_length=36), future_time: str = Path(...,min_length=1, max_length=5))-> List[SimplifiedPrice]:
-
-    unix_time_end = 1684626776
+def predict_(asset_id: str = Path(min_length=36, max_length=36), future_time: str = Path(...,min_length=1, max_length=5), unix_time_end: str = Query(min_length=2,max_length=10))-> List[SimplifiedPrice]:
 
     serach_historic_data = PredictService(db.session).get_indicators_and_merge(asset_id, unix_time_end,future_time)
-
-    print(serach_historic_data)
 
     try:
         # Convert dataframe to a list of SimplifiedPrice objects
