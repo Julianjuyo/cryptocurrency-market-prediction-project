@@ -11,8 +11,8 @@ import os
 sys.path.append('/opt/airflow/dags/utils/')
 
 
-EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-ADAUSDT_DAY_ID = "c9313f95-9565-49a8-b96b-d96989f83820"
+EXCHANGE_ID = "e47be64c-3398-404f-878f-b5a5009a8f25"
+ADAUSDT_DAY_ID = "f51c2eaf-b543-400f-8c12-cb6eb028ff67"
 
 
 def main():

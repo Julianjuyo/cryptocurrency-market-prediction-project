@@ -15,8 +15,8 @@ from airflow.operators.dummy import DummyOperator
 
 
 
-EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-BTCUSDT_MINUTE_ID = "bbf9f332-a499-4473-8095-9c17923556f6"
+EXCHANGE_ID = "e47be64c-3398-404f-878f-b5a5009a8f25"
+BTCUSDT_MINUTE_ID = "6edf3a24-727b-47a9-b5fa-cd7d4ab47ae7"
 
 
 def main():

@@ -14,8 +14,8 @@ from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
 from airflow.operators.dummy import DummyOperator
 
 
-EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-ETHUSDT_MINUTE_ID = "fc63b9a0-72e0-4ff0-a8b2-360cbd00b7ab"
+EXCHANGE_ID = "e47be64c-3398-404f-878f-b5a5009a8f25"
+ETHUSDT_MINUTE_ID = "fe62183b-10ae-4ea2-a104-bb02d8928502"
 
 
 def main():

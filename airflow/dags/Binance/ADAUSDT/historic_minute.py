@@ -13,8 +13,8 @@ from airflow import DAG
 from airflow.operators.python import PythonVirtualenvOperator, PythonOperator
 from airflow.operators.dummy import DummyOperator
 
-EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-ADAUSDT_MINUTE_ID = "105717ac-e8d5-4b1d-977d-6cc70d5d7ab8"
+EXCHANGE_ID = "e47be64c-3398-404f-878f-b5a5009a8f25"
+ADAUSDT_MINUTE_ID = "bebec362-9358-40a1-a36b-860a8b658520"
 
 def main():
 

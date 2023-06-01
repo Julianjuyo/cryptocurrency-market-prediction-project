@@ -15,8 +15,8 @@ from airflow.operators.dummy import DummyOperator
 
 
 
-EXCHANGE_ID = "384d3f6f-c8ab-4552-969a-70fce9b1b242"
-BNBUSDT_MINUTE_ID = "9a5e2374-d3b7-4408-9860-7a8fa34ac27e"
+EXCHANGE_ID = "e47be64c-3398-404f-878f-b5a5009a8f25"
+BNBUSDT_MINUTE_ID = "19f5e678-0c04-4991-9c67-abe3812f93c4"
 
 def main():
 
